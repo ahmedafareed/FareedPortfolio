@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import ParallaxHero from '@/components/parallax-hero';
@@ -16,9 +17,10 @@ const credentials = [
 
 const personalityWords = ['OBSERVER', 'MINIMALIST', 'STORYTELLER'];
 
-export default function Home({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
+export default function Home() {
     const [scrollPercentage, setScrollPercentage] = useState(0);
     const [localTime, setLocalTime] = useState('');
+    const searchParams = useSearchParams();
 
     const heroImages = PlaceHolderImages.filter(p => p.id.startsWith("portfolio-landscape-")).slice(0, 3);
     const rhythmGalleryImages = PlaceHolderImages.filter(p => p.id.startsWith("portfolio-")).slice(3, 8);
