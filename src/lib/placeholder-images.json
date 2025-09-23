@@ -1,3 +1,130 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "hero-main",
+      "description": "A stunning landscape of mountains at sunset, reflecting in a calm lake.",
+      "imageUrl": "https://images.unsplash.com/photo-1610892415063-d89a504ce049?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxtb3VudGFpbiUyMGxhbmRzY2FwZXxlbnwwfHx8fDE3NTg1ODM2NjZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "mountain landscape"
+    },
+    {
+      "id": "featured-1",
+      "description": "A close-up portrait of a smiling bride.",
+      "imageUrl": "https://images.unsplash.com/photo-1729773173866-022d39fc6c50?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxicmlkZSUyMHBvcnRyYWl0fGVufDB8fHx8MTc1ODU4Njk5M3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "bride portrait"
+    },
+    {
+      "id": "featured-2",
+      "description": "A dramatic landscape of a coastline with waves crashing.",
+      "imageUrl": "https://images.unsplash.com/photo-1558658252-8f1c708949c8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxjb2FzdGxpbmUlMjBsYW5kc2NhcGV8ZW58MHx8fHwxNzU4NTg2OTkzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "coastline landscape"
+    },
+    {
+      "id": "featured-3",
+      "description": "A professional headshot of a man in a suit.",
+      "imageUrl": "https://images.unsplash.com/photo-1595211877493-41a4e5f236b3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxwcm9mZXNzaW9uYWwlMjBoZWFkc2hvdHxlbnwwfHx8fDE3NTg1ODQ4MTl8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "professional headshot"
+    },
+    {
+      "id": "portfolio-landscape-1",
+      "description": "A newly married couple holding hands and walking away at sunset.",
+      "imageUrl": "https://images.unsplash.com/photo-1630526720753-aa4e71acf67d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHx3ZWRkaW5nJTIwY291cGxlfGVufDB8fHx8MTc1ODU4Njk5M3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "wedding couple"
+    },
+    {
+      "id": "portfolio-portrait-1",
+      "description": "A bride looking over her shoulder, with her veil flowing.",
+      "imageUrl": "https://images.unsplash.com/photo-1633037387298-dc308ab1bce1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxicmlkZSUyMHBvcnRyYWl0fGVufDB8fHx8MTc1ODU4Njk5M3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "bride portrait"
+    },
+    {
+      "id": "portfolio-square-1",
+      "description": "A close-up of wedding rings on a bouquet of flowers.",
+      "imageUrl": "https://images.unsplash.com/photo-1553915632-175f60dd8e36?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHx3ZWRkaW5nJTIwcmluZ3N8ZW58MHx8fHwxNzU4NTg2OTkzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "wedding rings"
+    },
+    {
+      "id": "portfolio-landscape-2",
+      "description": "A full bridal party laughing and celebrating.",
+      "imageUrl": "https://images.unsplash.com/photo-1497336755022-a433d2fcf62c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxicmlkYWwlMjBwYXJ0eXxlbnwwfHx8fDE3NTg1ODY5OTN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "bridal party"
+    },
+    {
+      "id": "portfolio-portrait-2",
+      "description": "A sharp, professional headshot of a businesswoman against a clean background.",
+      "imageUrl": "https://images.unsplash.com/photo-1675663351050-89949e051c38?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxidXNpbmVzc3dvbWFuJTIwcG9ydHJhaXR8ZW58MHx8fHwxNzU4NTg2OTkzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "businesswoman portrait"
+    },
+    {
+      "id": "portfolio-square-2",
+      "description": "A candid shot of a family playing in a park.",
+      "imageUrl": "https://images.unsplash.com/photo-1671819061849-8a02307d7fe8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxmYW1pbHklMjBjYW5kaWR8ZW58MHx8fHwxNzU4NTg2OTkzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "family candid"
+    },
+    {
+      "id": "portfolio-landscape-3",
+      "description": "An author sitting at a desk, surrounded by books.",
+      "imageUrl": "https://images.unsplash.com/photo-1680356475155-3ca8fa2192aa?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxhdXRob3IlMjBwb3J0cmFpdHxlbnwwfHx8fDE3NTg1ODY5OTN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "author portrait"
+    },
+    {
+      "id": "portfolio-portrait-3",
+      "description": "A graduate in cap and gown, smiling brightly.",
+      "imageUrl": "https://images.unsplash.com/photo-1756714874246-ccee975933e0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxncmFkdWF0ZSUyMHBvcnRyYWl0fGVufDB8fHx8MTc1ODU4Njk5M3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "graduate portrait"
+    },
+    {
+      "id": "portfolio-landscape-4",
+      "description": "A panoramic view of a mountain range covered in snow.",
+      "imageUrl": "https://images.unsplash.com/photo-1681672132069-c62f67011880?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxzbm93eSUyMG1vdW50YWluc3xlbnwwfHx8fDE3NTg1ODY5OTN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "snowy mountains"
+    },
+    {
+      "id": "portfolio-portrait-4",
+      "description": "A trail leading through a dense, green forest with light filtering through the trees.",
+      "imageUrl": "https://images.unsplash.com/photo-1589665209931-949d5fd007e1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxmb3Jlc3QlMjB0cmFpbHxlbnwwfHx8fDE3NTg1ODY5OTN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "forest trail"
+    },
+    {
+      "id": "portfolio-square-3",
+      "description": "A calm beach at sunrise with gentle waves lapping the shore.",
+      "imageUrl": "https://images.unsplash.com/photo-1601562219653-0f16522227b3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxiZWFjaCUyMHN1bnJpc2V8ZW58MHx8fHwxNzU4NTg2OTkzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "beach sunrise"
+    },
+    {
+      "id": "portfolio-landscape-5",
+      "description": "The sun rising over vast sand dunes in a desert.",
+      "imageUrl": "https://images.unsplash.com/photo-1723124695882-906dda1cd2c7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8ZGVzZXJ0JTIwc3VucmlzZXxlbnwwfHx8fDE3NTg1ODY5OTN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "desert sunrise"
+    },
+    {
+      "id": "about-headshot",
+      "description": "A professional and friendly headshot of Ahmed Fareed.",
+      "imageUrl": "https://images.unsplash.com/photo-1621025061568-e996db998690?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8cGhvdG9ncmFwaGVyJTIwaGVhZHNob3R8ZW58MHx8fHwxNzU4NTg2OTkzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "photographer headshot"
+    },
+    {
+      "id": "award-1",
+      "description": "A photo of an award trophy for Photographer of the Year.",
+      "imageUrl": "https://images.unsplash.com/photo-1739712695527-25e41e81762c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8YXdhcmQlMjB0cm9waHl8ZW58MHx8fHwxNzU4NTg2OTkzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "award trophy"
+    },
+    {
+      "id": "award-2",
+      "description": "A picture from the WPPI awards ceremony.",
+      "imageUrl": "https://images.unsplash.com/photo-1659274247836-3736fb2d984a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxhd2FyZHMlMjBjZXJlbW9ueXxlbnwwfHx8fDE3NTg1ODY5OTN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "awards ceremony"
+    },
+    {
+      "id": "award-3",
+      "description": "A photograph on display in a modern art gallery.",
+      "imageUrl": "https://images.unsplash.com/photo-1640350168509-756f1ef84b37?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxnYWxsZXJ5JTIwZXhoaWJpdGlvbnxlbnwwfHx8fDE3NTg1ODY5OTN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "gallery exhibition"
+    },
+    {
+      "id": "award-4",
+      "description": "A stunning landscape photo that won a contest.",
+      "imageUrl": "https://images.unsplash.com/photo-1626238247302-2f3065c90ff5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxsYW5kc2NhcGUlMjBwaG90b2dyYXBofGVufDB8fHx8MTc1ODU4Njk5M3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "landscape photograph"
+    }
+  ]
 }
