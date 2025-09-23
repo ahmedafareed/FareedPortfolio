@@ -16,7 +16,7 @@ const credentials = [
 
 const personalityWords = ['OBSERVER', 'MINIMALIST', 'STORYTELLER'];
 
-export default function Home() {
+export default function Home({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
     const [scrollPercentage, setScrollPercentage] = useState(0);
     const [localTime, setLocalTime] = useState('');
 
