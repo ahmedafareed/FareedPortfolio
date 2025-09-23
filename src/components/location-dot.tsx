@@ -2,15 +2,16 @@
 
 import { usePathname } from "next/navigation";
 import Link from 'next/link';
-import { Home, Aperture, User, Award, Mail, Plus, Diamond } from "lucide-react";
+import { Home, Aperture, User, Award, Mail, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const navItems = [
-  { href: '/', label: 'Home', icon: Home, shape: 'circle' },
-  { href: '/portfolio', label: 'Portfolio', icon: Aperture, shape: 'filled-circle' },
-  { href: '/about', label: 'About Me', icon: User, shape: 'square' },
-  { href: '/awards', label: 'Awards', icon: Award, shape: 'diamond' },
-  { href: '/contact', label: 'Contact', icon: Mail, shape: 'plus' },
+  { href: '/', label: 'Home', shape: 'circle' },
+  { href: '/portfolio', label: 'Portfolio', shape: 'filled-circle' },
+  { href: '/about', label: 'About', shape: 'square' },
+  { href: '/awards', label: 'Awards', shape: 'diamond' },
+  { href: '/contact', label: 'Contact', shape: 'plus' },
 ];
 
 const Shape = ({ shape, className }: { shape: string; className?: string }) => {
@@ -30,16 +31,33 @@ const Shape = ({ shape, className }: { shape: string; className?: string }) => {
     }
 };
 
-
 export default function LocationDot() {
     const pathname = usePathname();
     const currentItem = navItems.find(item => item.href === pathname);
 
     return (
         <div className="fixed top-10 left-10 z-50">
-            <Link href={currentItem?.href || "/"} aria-label={currentItem?.label || "current page"}>
-                {currentItem && <Shape shape={currentItem.shape} />}
-            </Link>
+            <Popover>
+                <PopoverTrigger asChild>
+                    <button className="flex items-center justify-center w-6 h-6" aria-label="Open navigation menu">
+                        {currentItem && <Shape shape={currentItem.shape} />}
+                    </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-2 bg-background/80 backdrop-blur-sm border-border" side="bottom" align="start">
+                    <nav>
+                        <ul>
+                            {navItems.map(item => (
+                                <li key={item.href}>
+                                    <Link href={item.href} className="flex items-center gap-4 px-3 py-2 text-sm font-body hover:bg-muted/50 rounded-sm">
+                                        <Shape shape={item.shape} />
+                                        <span>{item.label}</span>
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </nav>
+                </PopoverContent>
+            </Popover>
         </div>
     )
 }
