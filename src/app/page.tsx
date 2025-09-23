@@ -6,7 +6,6 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import ParallaxHero from '@/components/parallax-hero';
 import StatsSection from '@/components/stats-section';
 import { cn } from '@/lib/utils';
-import Link from 'next/link';
 
 const credentials = [
     { name: 'NATIONAL GEOGRAPHIC', year: '2024' },
@@ -53,7 +52,7 @@ export default function Home() {
             
             {/* SECTION 1: INTRODUCTION */}
             <ParallaxHero images={heroImages} />
-            <div className="h-screen bg-white" />
+            <div className="h-screen bg-background" />
 
 
             {/* SECTION 2: PROOF */}
@@ -85,7 +84,7 @@ export default function Home() {
                     })}
                 </div>
             </section>
-            <div className="h-screen bg-white" />
+            <div className="h-screen bg-background" />
 
 
             {/* SECTION 3: THE WORK */}
@@ -123,12 +122,12 @@ export default function Home() {
                     </>
                 )}
             </section>
-            <div className="h-screen bg-white" />
+            <div className="h-screen bg-background" />
 
 
             {/* SECTION 4: THE NUMBERS */}
             <StatsSection />
-            <div className="h-screen bg-white" />
+            <div className="h-screen bg-background" />
 
             
             {/* SECTION 5: THE PERSONALITY */}
@@ -144,10 +143,10 @@ export default function Home() {
                     })}
                 </div>
             </section>
-            <div className="h-screen bg-white" />
+            <div className="h-screen bg-background" />
 
             {/* SPACER SECTION 6 & 7 */}
-            <div className="h-[200vh] bg-white" />
+            <div className="h-[200vh] bg-background" />
 
             {/* SECTION 8: THE INVITATION */}
             <section className="h-screen w-full relative flex flex-col items-center justify-center text-center p-4">

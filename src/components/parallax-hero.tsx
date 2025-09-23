@@ -34,7 +34,7 @@ export default function ParallaxHero({ images }: ParallaxHeroProps) {
     const parallaxY = mousePosition.y * -10;
 
     return (
-        <section className="h-screen w-full sticky top-0 flex items-center justify-center overflow-hidden">
+        <section className="h-screen w-full relative flex items-center justify-center overflow-hidden">
             {/* Background Images */}
             {images.map((image, index) => (
                 <div
