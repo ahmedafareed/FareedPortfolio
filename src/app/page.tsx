@@ -53,36 +53,6 @@ export default function Home() {
             {/* SECTION 1: INTRODUCTION */}
             <ParallaxHero images={heroImages} />
 
-            {/* SECTION 2: PROOF */}
-            <section className="h-screen w-full flex items-center justify-center overflow-hidden relative py-24">
-                <div className="w-full max-w-4xl mx-auto px-4">
-                    {credentials.map((cred, index) => {
-                        const isAligned = scrollPercentage > 5 && scrollPercentage < 15;
-                        const initialTop = 10 + index * 20;
-                        const initialLeft = 10 + (index % 2 === 0 ? index * 15 : 100 - index * 15 - 30);
-                        const opacity = isAligned ? 1 : 0.3;
-
-                        return (
-                             <div 
-                                key={cred.name}
-                                className="absolute transition-all duration-1000 ease-in-out"
-                                style={{
-                                    top: isAligned ? `${25 + index * 12.5}%` : `${initialTop}%`,
-                                    left: isAligned ? `50%` : `${initialLeft}%`,
-                                    transform: isAligned ? 'translateX(-50%)' : 'translateX(0)',
-                                    opacity
-                                }}
-                            >
-                                <div className="flex justify-between items-center w-80">
-                                    <span>{cred.name}</span>
-                                    <span>{cred.year}</span>
-                                </div>
-                            </div>
-                        )
-                    })}
-                </div>
-            </section>
-
             {/* SECTION 3: THE WORK */}
             <section className="w-full py-24 px-4 md:px-8 space-y-32">
                 {rhythmGalleryImages.length > 0 && (
@@ -117,6 +87,36 @@ export default function Home() {
                         )}
                     </>
                 )}
+            </section>
+            
+            {/* SECTION 2: PROOF */}
+            <section className="h-screen w-full flex items-center justify-center overflow-hidden relative py-24">
+                <div className="w-full max-w-4xl mx-auto px-4">
+                    {credentials.map((cred, index) => {
+                        const isAligned = scrollPercentage > 35 && scrollPercentage < 55;
+                        const initialTop = 10 + index * 20;
+                        const initialLeft = 10 + (index % 2 === 0 ? index * 15 : 100 - index * 15 - 30);
+                        const opacity = isAligned ? 1 : 0.3;
+
+                        return (
+                             <div 
+                                key={cred.name}
+                                className="absolute transition-all duration-1000 ease-in-out"
+                                style={{
+                                    top: isAligned ? `${25 + index * 12.5}%` : `${initialTop}%`,
+                                    left: isAligned ? `50%` : `${initialLeft}%`,
+                                    transform: isAligned ? 'translateX(-50%)' : 'translateX(0)',
+                                    opacity
+                                }}
+                            >
+                                <div className="flex justify-between items-center w-80">
+                                    <span>{cred.name}</span>
+                                    <span>{cred.year}</span>
+                                </div>
+                            </div>
+                        )
+                    })}
+                </div>
             </section>
 
             {/* SECTION 4: THE NUMBERS */}
