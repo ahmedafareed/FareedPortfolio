@@ -48,6 +48,22 @@ CREATE TABLE IF NOT EXISTS awards (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Create exhibitions table
+CREATE TABLE IF NOT EXISTS exhibitions (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    title VARCHAR(255) NOT NULL,
+    venue VARCHAR(255) NOT NULL,
+    location VARCHAR(255),
+    year INTEGER NOT NULL,
+    month VARCHAR(20),
+    description TEXT,
+    image_url TEXT,
+    storage_path TEXT,
+    sort_order INTEGER DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- Create site settings table for global configuration
 CREATE TABLE IF NOT EXISTS site_settings (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

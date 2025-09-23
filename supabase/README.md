@@ -15,6 +15,7 @@ Create a `.env.local` file in the root directory with your Supabase credentials:
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 ADMIN_PASSWORD=your_admin_password_for_basic_auth
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key # required for uploads
 ```
 
 ### 3. Run Database Schema
@@ -31,6 +32,7 @@ If you want to use Supabase Storage for image uploads:
 1. Go to Storage in your Supabase dashboard
 2. Create a new bucket called `portfolio-images`
 3. Set the bucket to public if you want images to be publicly accessible
+4. The admin upload endpoint stores files at `portfolio-images/<random-name>` and inserts records into `portfolio_images`
 
 ## Database Schema Overview
 

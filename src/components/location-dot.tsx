@@ -10,7 +10,7 @@ const navItems = [
   { href: '/', label: 'Home', shape: 'circle' },
   { href: '/portfolio', label: 'Portfolio', shape: 'filled-circle' },
   { href: '/about', label: 'About', shape: 'square' },
-  { href: '/awards', label: 'Awards', shape: 'diamond' },
+    { href: '/awards', label: 'Awards & Exhibitions', shape: 'diamond' },
   { href: '/contact', label: 'Contact', shape: 'plus' },
 ];
 
@@ -48,12 +48,12 @@ export default function LocationDot() {
                         {currentItem && <Shape shape={currentItem.shape} />}
                     </button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-2 bg-transparent backdrop-blur-sm border-none shadow-none" side="bottom" align="start">
+                <PopoverContent className="w-auto p-2 bg-white border border-border shadow-lg" side="bottom" align="start">
                     <nav>
                         <ul>
                             {navItems.map(item => (
                                 <li key={item.href}>
-                                    <Link href={item.href} className="flex items-center gap-4 px-3 py-2 text-sm font-body text-white hover:bg-white/20 rounded-sm">
+                                    <Link href={item.href} className="flex items-center gap-4 px-3 py-2 text-sm font-body text-black hover:bg-gray-100 rounded-sm">
                                         <Shape shape={item.shape} />
                                         <span>{item.label}</span>
                                     </Link>

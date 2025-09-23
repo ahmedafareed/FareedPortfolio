@@ -20,12 +20,34 @@ export default function AdminPage() {
             </Card>
             <Card>
                 <CardHeader>
+                    <CardTitle>Manage Categories</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-muted-foreground mb-4">Create and organize portfolio categories.</p>
+                    <Button asChild variant="outline">
+                        <Link href="/admin/categories">Go to Categories</Link>
+                    </Button>
+                </CardContent>
+            </Card>
+            <Card>
+                <CardHeader>
                     <CardTitle>Manage Awards</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <p className="text-muted-foreground mb-4">Add or update your awards and exhibitions.</p>
+                    <p className="text-muted-foreground mb-4">Add or update your awards and recognitions.</p>
                     <Button asChild>
                         <Link href="/admin/awards">Go to Awards</Link>
+                    </Button>
+                </CardContent>
+            </Card>
+            <Card>
+                <CardHeader>
+                    <CardTitle>Manage Exhibitions</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-muted-foreground mb-4">Add or update your exhibitions and shows.</p>
+                    <Button asChild variant="outline">
+                        <Link href="/admin/exhibitions">Go to Exhibitions</Link>
                     </Button>
                 </CardContent>
             </Card>

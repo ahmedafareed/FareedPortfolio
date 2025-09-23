@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import { Instagram, Linkedin, Mail } from 'lucide-react';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Button } from '@/components/ui/button';
 import { ContactForm } from '@/components/contact-form';
+import { PortfolioService } from '@/lib/supabase';
 
 export const metadata: Metadata = {
   title: 'Contact | Ahmed Fareed',
@@ -15,8 +15,9 @@ const socialLinks = [
     { name: 'LinkedIn', href: '#', icon: Linkedin },
 ];
 
-export default function ContactPage() {
-  const contactImage = PlaceHolderImages.find(p => p.id === 'portfolio-portrait-2');
+export default async function ContactPage() {
+  const featured = await PortfolioService.getFeaturedImages();
+  const contactImage = featured[0];
 
   return (
     <div className="min-h-screen grid grid-cols-1 md:grid-cols-2">
@@ -45,13 +46,13 @@ export default function ContactPage() {
         </div>
       </div>
       <div className="relative hidden md:block">
-        {contactImage && (
+    {contactImage && (
             <Image
-                src={contactImage.imageUrl}
-                alt={contactImage.description}
+        src={contactImage.image_url}
+        alt={contactImage.description || ''}
                 fill
                 className="object-cover"
-                data-ai-hint={contactImage.imageHint}
+        data-ai-hint={contactImage.alt_text || ''}
                 priority
             />
         )}

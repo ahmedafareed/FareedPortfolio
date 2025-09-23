@@ -2,13 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import type { ImagePlaceholder } from '@/lib/placeholder-images';
+
+type HeroImage = { id: string; imageUrl: string; description: string; imageHint?: string };
 
 interface ParallaxHeroProps {
-    images: ImagePlaceholder[];
+    images: HeroImage[];
+    tagline?: string;
 }
 
-export default function ParallaxHero({ images }: ParallaxHeroProps) {
+export default function ParallaxHero({ images, tagline = 'AVAILABLE FOR COMMISSIONS' }: ParallaxHeroProps) {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
@@ -68,7 +70,7 @@ export default function ParallaxHero({ images }: ParallaxHeroProps) {
             {/* Bottom Right Corner */}
             <div className="absolute bottom-10 right-10 z-10">
                 <p className="text-white text-xs font-light tracking-widest animate-pulse">
-                    AVAILABLE FOR COMMISSIONS
+                    {tagline}
                 </p>
             </div>
         </section>

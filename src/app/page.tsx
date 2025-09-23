@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import ParallaxHero from '@/components/parallax-hero';
 import StatsSection from '@/components/stats-section';
 import { cn } from '@/lib/utils';
+import { PortfolioService } from '@/lib/supabase';
 
 const credentials = [
     { name: 'NATIONAL GEOGRAPHIC', year: '2024' },
@@ -19,10 +19,12 @@ const personalityWords = ['OBSERVER', 'MINIMALIST', 'STORYTELLER'];
 export default function Home() {
     const [scrollPercentage, setScrollPercentage] = useState(0);
     const [localTime, setLocalTime] = useState('');
+    const [contactEmail, setContactEmail] = useState('hello@ahmedfareed.com');
+    const [siteTagline, setSiteTagline] = useState('AVAILABLE FOR COMMISSIONS');
 
-    const heroImages = PlaceHolderImages.filter(p => p.id.startsWith("portfolio-landscape-")).slice(0, 3);
-    const rhythmGalleryImages = PlaceHolderImages.filter(p => p.id.startsWith("portfolio-")).slice(3, 8);
-    const contactImage = PlaceHolderImages.find(p => p.id === 'award-4');
+    const [heroImages, setHeroImages] = useState<{ id: string; imageUrl: string; description: string; imageHint?: string }[]>([]);
+    const [rhythmGalleryImages, setRhythmGalleryImages] = useState<{ imageUrl: string; description: string; imageHint?: string }[]>([]);
+    const [contactImage, setContactImage] = useState<{ imageUrl: string; description: string; imageHint?: string } | null>(null);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -33,11 +35,64 @@ export default function Home() {
         };
 
         window.addEventListener('scroll', handleScroll);
-        
+
         // Set local time
         const now = new Date();
         const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         setLocalTime(timeString);
+
+        // Load images and settings from Supabase
+        (async () => {
+            const [heroSetting, featuredImages, allImages, taglineSetting, emailSetting] = await Promise.all([
+                PortfolioService.getSetting('hero_image_id'),
+                PortfolioService.getFeaturedImages(),
+                PortfolioService.getImages(),
+                PortfolioService.getSetting('site_tagline'),
+                PortfolioService.getSetting('contact_email'),
+            ]);
+
+            // Set contact email and tagline if available
+            if (emailSetting?.value) {
+                setContactEmail(emailSetting.value);
+            }
+            if (taglineSetting?.value) {
+                setSiteTagline(taglineSetting.value);
+            }
+
+            const heroId = heroSetting?.value;
+            const images = featuredImages.length > 0 ? featuredImages : allImages;
+            
+            if (images && images.length > 0) {
+                let hero = null;
+                
+                // First try to find hero by ID from all images (not just featured)
+                if (heroId) {
+                    hero = allImages.find((i) => i.id === heroId);
+                }
+                
+                // If no hero found by ID, use first featured image, or first image
+                if (!hero) {
+                    hero = images[0];
+                }
+                
+                const rest = images.filter((i) => i.id !== hero?.id).slice(0, 2);
+                setHeroImages([
+                    { id: hero?.id || 'hero', imageUrl: hero?.image_url || '', description: hero?.description || '', imageHint: hero?.alt_text || '' },
+                    ...rest.map(i => ({ id: i.id, imageUrl: i.image_url, description: i.description || '', imageHint: i.alt_text || '' }))
+                ]);
+
+                // Use more featured images for rhythm section
+                const rhythm = images.slice(0, 5).map(i => ({ imageUrl: i.image_url, description: i.description || '', imageHint: i.alt_text || '' }));
+                setRhythmGalleryImages(rhythm);
+
+                // Use last featured as contact backdrop
+                setContactImage(rhythm[rhythm.length - 1] || null);
+            } else {
+                setHeroImages([]);
+                setRhythmGalleryImages([]);
+                setContactImage(null);
+            }
+        })();
 
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
@@ -51,7 +106,7 @@ export default function Home() {
             </div>
             
             {/* SECTION 1: INTRODUCTION */}
-            <ParallaxHero images={heroImages} />
+            {heroImages.length > 0 && <ParallaxHero images={heroImages} tagline={siteTagline} />}
 
             {/* SECTION 3: THE WORK */}
             <section className="w-full py-24 px-4 md:px-8 space-y-32">
@@ -124,7 +179,7 @@ export default function Home() {
             
             {/* SECTION 5: THE PERSONALITY */}
             <section className="h-screen w-full relative flex items-center justify-center py-24">
-                 {rhythmGalleryImages.length > 0 && <Image src={PlaceHolderImages.find(p => p.id === 'about-headshot')?.imageUrl || ''} alt="Self Portrait" fill className="object-cover" data-ai-hint="photographer workspace" />}
+                 {/* Optional background if you add a headshot later */}
                 <div className="absolute inset-0 bg-black/50" />
                  <div className="relative z-10 text-white text-4xl md:text-6xl font-extralight text-center">
                     {personalityWords.map((word, index) => {
@@ -151,8 +206,8 @@ export default function Home() {
 
                 <div className="relative z-10 text-foreground">
                     <h2 className="font-headline text-3xl md:text-5xl mb-8">Let's Work Together</h2>
-                    <a href="mailto:hello@ahmedfareed.com" className="text-lg md:text-2xl font-body block mb-2 hover:underline">
-                        hello@ahmedfareed.com
+                    <a href={`mailto:${contactEmail}`} className="text-lg md:text-2xl font-body block mb-2 hover:underline">
+                        {contactEmail}
                     </a>
                     <p className="text-sm text-muted-foreground mb-8">RESPONSE WITHIN 24 HOURS</p>
                     <p className="text-xs text-muted-foreground/50">Currently {localTime} in my timezone.</p>

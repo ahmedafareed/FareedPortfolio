@@ -3,55 +3,155 @@
 import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Settings, Globe } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { PortfolioService, type PortfolioImageWithCategory, type SiteSetting } from "@/lib/supabase";
 
 export default function AdminSettingsPage() {
+  const [images, setImages] = useState<PortfolioImageWithCategory[]>([]);
+  const [heroId, setHeroId] = useState<string | undefined>(undefined);
+  const [siteTagline, setSiteTagline] = useState('');
+  const [contactEmail, setContactEmail] = useState('');
+  const [aboutDescription, setAboutDescription] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [aboutHeadshotId, setAboutHeadshotId] = useState<string | undefined>(undefined);
+  const [loading, setLoading] = useState(true);
+
+  const load = async () => {
+    setLoading(true);
+    const [imgs, heroSetting, tagline, email, about, headshot] = await Promise.all([
+      PortfolioService.getImages(),
+      PortfolioService.getSetting('hero_image_id'),
+      PortfolioService.getSetting('site_tagline'),
+      PortfolioService.getSetting('contact_email'),
+      PortfolioService.getSetting('about_description'),
+      PortfolioService.getSetting('about_headshot_id'),
+    ]);
+    setImages(imgs);
+    setHeroId(heroSetting?.value || undefined);
+    setSiteTagline(tagline?.value || '');
+    setContactEmail(email?.value || '');
+    setAboutDescription(about?.value || '');
+  setAboutHeadshotId(headshot?.value || undefined);
+  setLoading(false);
+  };
+  useEffect(() => { load(); }, []);
+
+  const save = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    setSaveError(null);
+    try {
+      await Promise.all([
+        PortfolioService.setSetting(
+          'hero_image_id',
+          heroId ? String(heroId) : '',
+          'ID of the hero image for homepage',
+          'image_id'
+        ),
+        PortfolioService.setSetting(
+          'site_tagline',
+          siteTagline ? siteTagline : '',
+          'Tagline displayed on the site',
+          'text'
+        ),
+        PortfolioService.setSetting(
+          'contact_email',
+          contactEmail ? contactEmail : '',
+          'Contact email address for inquiries',
+          'email'
+        ),
+        PortfolioService.setSetting(
+          'about_description',
+          aboutDescription ? aboutDescription : '',
+          'Description for the About section',
+          'text'
+        ),
+        PortfolioService.setSetting(
+          'about_headshot_id',
+          aboutHeadshotId ? String(aboutHeadshotId) : '',
+          'ID of the headshot image for About section',
+          'image_id'
+        ),
+      ]);
+    } catch (err: any) {
+      let msg = err?.message || 'Failed to save settings. See console for details.';
+      if (msg.includes('Permission denied')) {
+        msg = 'Permission denied: You do not have access to update site settings. Check Supabase RLS and API key.';
+      } else if (msg.includes('Duplicate key')) {
+        msg = 'Duplicate key: This setting already exists.';
+      } else if (msg.includes('Constraint violation')) {
+        msg = 'Constraint violation: One or more fields do not meet table requirements.';
+      }
+      setSaveError(msg);
+    }
+    setSaving(false);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-headline">Site Settings</h1>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Hero Image Settings</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground mb-4">
-              Choose which image appears as the hero on your homepage.
-            </p>
-            <Button variant="outline">
-              Select Hero Image
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Site Information</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground mb-4">
-              Update site tagline, contact information, and other global settings.
-            </p>
-            <Button variant="outline">
-              Edit Site Info
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card className="text-center py-12">
+      <Card>
+        <CardHeader>
+          <CardTitle>Global Settings</CardTitle>
+        </CardHeader>
         <CardContent>
-          <Globe className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-          <h3 className="text-lg font-medium mb-2">Site Settings Management</h3>
-          <p className="text-muted-foreground mb-4">
-            Control global site settings and configuration.
-          </p>
-          <p className="text-sm text-muted-foreground">
-            Connect to Supabase to manage site settings.
-          </p>
+          {loading ? (
+            <p className="text-muted-foreground">Loading...</p>
+          ) : (
+            <form onSubmit={save} className="space-y-4">
+              {saveError && (
+                <div className="text-red-500 text-sm mb-2">{saveError}</div>
+              )}
+              <div>
+                <label className="block text-sm font-medium mb-1">Hero Image</label>
+                <Select value={heroId} onValueChange={(v) => setHeroId(v)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select hero image" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {images.length === 0 ? (
+                      <div className="px-2 py-1 text-sm text-muted-foreground">No images available. Upload some first.</div>
+                    ) : images.map(img => (
+                      <SelectItem key={img.id} value={img.id}>{img.title}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">About Headshot</label>
+                <Select value={aboutHeadshotId} onValueChange={(v) => setAboutHeadshotId(v)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select about headshot (optional)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {images.length === 0 ? (
+                      <div className="px-2 py-1 text-sm text-muted-foreground">No images available.</div>
+                    ) : images.map(img => (
+                      <SelectItem key={img.id} value={img.id}>{img.title}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Site Tagline</label>
+                <Input value={siteTagline} onChange={(e) => setSiteTagline(e.target.value)} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Contact Email</label>
+                <Input type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">About Description</label>
+                <textarea className="w-full border rounded p-2 min-h-[120px]" value={aboutDescription} onChange={(e) => setAboutDescription(e.target.value)} />
+              </div>
+              <Button type="submit" disabled={saving}>{saving ? 'Saving...' : 'Save Settings'}</Button>
+            </form>
+          )}
         </CardContent>
       </Card>
     </div>

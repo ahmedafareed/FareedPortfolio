@@ -28,6 +28,13 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      // Supabase storage public URLs (wildcard)
+      {
+        protocol: 'https',
+        hostname: '*.supabase.co',
+        port: '',
+        pathname: '/storage/v1/object/public/**',
+      },
     ],
   },
 };
