@@ -34,7 +34,7 @@ export default function ContactPage() {
             </div>
             <div className="flex justify-center space-x-4">
                 {socialLinks.map(social => (
-                     <Button asChild variant="ghost" size="icon">
+                     <Button key={social.name} asChild variant="ghost" size="icon">
                         <a href={social.href} target="_blank" rel="noopener noreferrer" aria-label={social.name}>
                             <social.icon className="h-6 w-6 text-muted-foreground hover:text-foreground" />
                         </a>
