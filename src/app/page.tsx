@@ -93,7 +93,7 @@ export default function Home() {
             <section className="h-screen w-full flex items-center justify-center overflow-hidden relative py-24">
                 <div className="w-full max-w-4xl mx-auto px-4">
                     {credentials.map((cred, index) => {
-                        const isAligned = scrollPercentage > 35 && scrollPercentage < 55;
+                        const isAligned = scrollPercentage > 50 && scrollPercentage < 70;
                         const initialTop = 10 + index * 20;
                         const initialLeft = 10 + (index % 2 === 0 ? index * 15 : 100 - index * 15 - 30);
                         const opacity = isAligned ? 1 : 0.3;
