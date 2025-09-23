@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
-import { Button } from '@/components/ui/button';
-import { Instagram, Linkedin } from 'lucide-react';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import Image from 'next/image';
+import { Instagram, Linkedin, Mail } from 'lucide-react';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { Button } from '@/components/ui/button';
+import { ContactForm } from '@/components/contact-form';
 
 export const metadata: Metadata = {
   title: 'Contact | Ahmed Fareed',
@@ -15,44 +16,45 @@ const socialLinks = [
 ];
 
 export default function ContactPage() {
-  const portfolioImages = PlaceHolderImages.filter(p => p.id.startsWith("portfolio-"));
+  const contactImage = PlaceHolderImages.find(p => p.id === 'portfolio-portrait-2');
 
   return (
-    <div className="relative min-h-screen flex flex-col items-center justify-center text-center p-4">
-      <div className="absolute inset-0 z-0">
-        {portfolioImages.map((image, index) => (
-          <Image
-            key={image.id}
-            src={image.imageUrl}
-            alt=""
-            fill
-            className={`object-cover transition-opacity duration-[3000ms] ease-in-out opacity-0 animate-fade-in-out`}
-            style={{ animationDelay: `${index * 5}s` }}
-            aria-hidden="true"
-          />
-        ))}
-        <div className="absolute inset-0 bg-background/95"></div>
-      </div>
-      
-      <div className="relative z-10">
-        <a href="mailto:contact@ahmedfareed.com" className="text-base font-body block mb-4">
-          contact@ahmedfareed.com
-        </a>
-        <div className="flex justify-center items-center space-x-2 group">
-          <span className="text-muted-foreground/50">·</span>
-          <span className="text-muted-foreground/50">·</span>
-          <span className="text-muted-foreground/50">·</span>
-
-          <div className="absolute bottom-full mb-2 flex space-x-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-             {socialLinks.map((social) => (
-                <Button key={social.name} asChild variant="ghost" size="icon" className="w-8 h-8">
-                    <a href={social.href} target="_blank" rel="noopener noreferrer" aria-label={social.name}>
-                        <social.icon className="h-4 w-4 text-foreground" />
-                    </a>
-                </Button>
-            ))}
-          </div>
+    <div className="min-h-screen grid grid-cols-1 md:grid-cols-2">
+      <div className="p-8 md:p-16 lg:p-24 flex flex-col justify-center">
+        <div className="max-w-md">
+            <h1 className="font-headline text-4xl md:text-5xl mb-4">Get in Touch</h1>
+            <p className="text-muted-foreground mb-12">
+                Have a project in mind? I'd love to hear from you. Fill out the form or email me directly.
+            </p>
+            <ContactForm />
+            <div className="mt-12">
+                <a href="mailto:contact@ahmedfareed.com" className="flex items-center group">
+                    <Mail className="w-4 h-4 mr-2 text-muted-foreground group-hover:text-primary transition-colors" />
+                    <span className="text-sm font-body group-hover:text-primary transition-colors">contact@ahmedfareed.com</span>
+                </a>
+                <div className="flex mt-4 space-x-4">
+                    {socialLinks.map((social) => (
+                        <Button key={social.name} asChild variant="ghost" size="icon" className="w-8 h-8">
+                            <a href={social.href} target="_blank" rel="noopener noreferrer" aria-label={social.name}>
+                                <social.icon className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                            </a>
+                        </Button>
+                    ))}
+                </div>
+            </div>
         </div>
+      </div>
+      <div className="relative hidden md:block">
+        {contactImage && (
+            <Image
+                src={contactImage.imageUrl}
+                alt={contactImage.description}
+                fill
+                className="object-cover"
+                data-ai-hint={contactImage.imageHint}
+                priority
+            />
+        )}
       </div>
     </div>
   );
