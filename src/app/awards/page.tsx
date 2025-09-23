@@ -1,14 +1,6 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { getFullAwards } from '@/lib/data';
+import Image from 'next/image';
 
 export const metadata: Metadata = {
   title: 'Awards & Exhibitions | Ahmed Fareed',
@@ -16,55 +8,50 @@ export const metadata: Metadata = {
 };
 
 export default function AwardsPage() {
-    const awardsData = getFullAwards();
+    const awardsData = getFullAwards().sort((a,b) => b.year - a.year);
+    const currentYear = new Date().getFullYear();
 
-  return (
-    <div className="container mx-auto px-4 py-16 sm:py-24 flex flex-col items-center">
-        <div className="text-center mb-12 animate-in fade-in-0 duration-500">
-            <h1 className="font-headline text-5xl md:text-6xl tracking-tight">Awards & Exhibitions</h1>
-            <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-                Recognitions and features that mark milestones in my photography journey.
-            </p>
-        </div>
+    return (
+        <div className="container mx-auto px-4 py-16 sm:py-24 min-h-screen flex justify-center">
+            <div className="w-full max-w-4xl">
+                <ul>
+                    {awardsData.map((award, index) => {
+                        const yearDiff = currentYear - award.year;
+                        const opacity = yearDiff > 5 ? 0.5 : 1 - (yearDiff * 0.1);
 
-        <div className="w-full max-w-4xl animate-in fade-in-0 duration-500 delay-200">
-            <Carousel
-                opts={{
-                    align: "start",
-                    loop: true,
-                }}
-                className="w-full"
-            >
-                <CarouselContent>
-                    {awardsData.map((award) => (
-                        <CarouselItem key={award.id} className="md:basis-1/2 lg:basis-1/3">
-                            <div className="p-1">
-                                <Card className="h-full flex flex-col">
-                                    <CardContent className="p-0">
-                                        <div className="aspect-w-3 aspect-h-2">
-                                            <Image
-                                                src={award.imageUrl}
-                                                alt={award.description}
-                                                width={600}
-                                                height={400}
-                                                className="w-full object-cover rounded-t-lg"
-                                                data-ai-hint={award.imageHint}
-                                            />
-                                        </div>
-                                    </CardContent>
-                                    <CardFooter className="flex-1 flex flex-col items-start justify-center p-6">
-                                        <h3 className="font-headline text-xl text-foreground">{award.title}</h3>
-                                        <p className="text-sm text-muted-foreground">{award.event}, {award.year}</p>
-                                    </CardFooter>
-                                </Card>
-                            </div>
-                        </CarouselItem>
-                    ))}
-                </CarouselContent>
-                <CarouselPrevious className="hidden sm:flex" />
-                <CarouselNext className="hidden sm:flex" />
-            </Carousel>
+                        return (
+                            <li 
+                                key={award.id} 
+                                className="group relative flex flex-col md:flex-row justify-between items-start md:items-center py-[20px] border-b border-border last:border-b-0"
+                                style={{ opacity }}
+                            >
+                                <p className="mb-2 md:mb-0 md:order-2 text-right text-gray-400">{award.year}</p>
+                                <p className="md:order-1 text-left">{award.title} - {award.event}</p>
+                                <div className="pointer-events-none absolute z-10 top-0 left-0 w-[100px] h-[100px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 md:group-hover:block hidden"
+                                    style={{ transform: 'translate(var(--x, 0), var(--y, 0))' }}
+                                    onMouseMoveCapture={(e) => {
+                                        const target = e.currentTarget;
+                                        const parent = target.parentElement;
+                                        if (parent) {
+                                            const rect = parent.getBoundingClientRect();
+                                            target.style.setProperty('--x', `${e.clientX - rect.left - 50}px`);
+                                            target.style.setProperty('--y', `${e.clientY - rect.top - 50}px`);
+                                        }
+                                    }}
+                                >
+                                     <Image 
+                                        src={award.imageUrl} 
+                                        alt={`Proof for ${award.title}`} 
+                                        width={100} 
+                                        height={100} 
+                                        className="object-cover"
+                                     />
+                                </div>
+                            </li>
+                        );
+                    })}
+                </ul>
+            </div>
         </div>
-    </div>
-  );
+    );
 }

@@ -1,17 +1,16 @@
-import { Button } from '@/components/ui/button';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
 
 export default function Home() {
   const heroImage = PlaceHolderImages.find((img) => img.id === 'hero-main');
-  const featuredImages = PlaceHolderImages.filter(p => p.id.startsWith("featured-"));
+  const featuredImages = PlaceHolderImages.filter(p => p.id.startsWith("featured-")).slice(0, 4);
+  const featuredTop = featuredImages.slice(0, 2);
+  const featuredBottom = featuredImages.slice(2, 4);
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <section className="relative h-[calc(100vh-5rem)] w-full flex items-center justify-center">
+    <div className="flex flex-col min-h-screen bg-background animate-in fade-in-0 duration-[2000ms] delay-[1500ms]">
+      <section className="relative h-screen w-full flex items-center justify-center">
         {heroImage && (
           <Image
             src={heroImage.imageUrl}
@@ -22,48 +21,55 @@ export default function Home() {
             data-ai-hint={heroImage.imageHint}
           />
         )}
-        <div className="absolute inset-0 bg-black/60" />
-        <div className="relative z-10 text-center text-white px-4 animate-in fade-in-0 duration-1000">
-          <h1 className="font-headline text-5xl md:text-7xl lg:text-8xl tracking-tight">
-            Ahmed Fareed
-          </h1>
-          <p className="mt-4 max-w-2xl mx-auto text-lg md:text-xl text-neutral-200">
-            Capturing life's moments in timeless photographs. Serving the greater region with passion and creativity.
-          </p>
-          <Button asChild size="lg" className="mt-8 bg-accent text-accent-foreground hover:bg-accent/90">
-            <Link href="/portfolio">
-              Explore My Work <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
-          </Button>
-        </div>
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-px h-[30px] bg-foreground animate-pulse" />
       </section>
 
       <section className="py-16 md:py-24 bg-background">
         <div className="container mx-auto px-4">
-          <h2 className="font-headline text-4xl md:text-5xl text-center mb-12">
-            Featured Work
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredImages.map((image, index) => (
-              <Link href="/portfolio" key={image.id} className="group">
-                <Card className="overflow-hidden border-2 border-transparent hover:border-primary transition-all duration-300">
-                   <CardContent className="p-0">
-                    <div className="aspect-w-4 aspect-h-3">
-                       <Image
-                        src={image.imageUrl}
-                        alt={image.description}
-                        width={600}
-                        height={450}
-                        className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300 animate-in fade-in-0"
-                        style={{animationDelay: `${index * 150}ms`, animationFillMode: 'backwards'}}
-                        data-ai-hint={image.imageHint}
-                       />
-                    </div>
-                   </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
+            <div className="grid grid-cols-10 gap-4 md:gap-8">
+                {featuredTop.length === 2 && (
+                    <>
+                        <div className="col-span-10 md:col-span-6 relative group">
+                            <Link href="/portfolio">
+                                <Image src={featuredTop[0].imageUrl} alt={featuredTop[0].description} width={1200} height={800} className="object-cover w-full h-full" data-ai-hint={featuredTop[0].imageHint} />
+                                <div className="absolute bottom-0 left-0 p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                    <p className="text-[10px] font-body text-white bg-black/50 px-1 py-0.5 rounded">Featured Work 1</p>
+                                </div>
+                            </Link>
+                        </div>
+                        <div className="col-span-10 md:col-span-4 relative group">
+                            <Link href="/portfolio">
+                                <Image src={featuredTop[1].imageUrl} alt={featuredTop[1].description} width={800} height={1200} className="object-cover w-full h-full" data-ai-hint={featuredTop[1].imageHint} />
+                                <div className="absolute bottom-0 left-0 p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                    <p className="text-[10px] font-body text-white bg-black/50 px-1 py-0.5 rounded">Featured Work 2</p>
+                                </div>
+                            </Link>
+                        </div>
+                    </>
+                )}
+            </div>
+             <div className="grid grid-cols-10 gap-4 md:gap-8 mt-4 md:mt-8">
+                {featuredBottom.length === 2 && (
+                    <>
+                        <div className="col-span-10 md:col-span-4 relative group">
+                             <Link href="/portfolio">
+                                <Image src={featuredBottom[0].imageUrl} alt={featuredBottom[0].description} width={800} height={1200} className="object-cover w-full h-full" data-ai-hint={featuredBottom[0].imageHint} />
+                                 <div className="absolute bottom-0 left-0 p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                    <p className="text-[10px] font-body text-white bg-black/50 px-1 py-0.5 rounded">Featured Work 3</p>
+                                </div>
+                            </Link>
+                        </div>
+                        <div className="col-span-10 md:col-span-6 relative group">
+                             <Link href="/portfolio">
+                                <Image src={featuredBottom[1].imageUrl} alt={featuredBottom[1].description} width={1200} height={800} className="object-cover w-full h-full" data-ai-hint={featuredBottom[1].imageHint} />
+                                 <div className="absolute bottom-0 left-0 p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                    <p className="text-[10px] font-body text-white bg-black/50 px-1 py-0.5 rounded">Featured Work 4</p>
+                                </div>
+                            </Link>
+                        </div>
+                    </>
+                )}
+            </div>
         </div>
       </section>
     </div>

@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Mail, Instagram, Linkedin } from 'lucide-react';
+import { Instagram, Linkedin } from 'lucide-react';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
+import Image from 'next/image';
 
 export const metadata: Metadata = {
   title: 'Contact | Ahmed Fareed',
@@ -11,38 +12,48 @@ export const metadata: Metadata = {
 const socialLinks = [
     { name: 'Instagram', href: '#', icon: Instagram },
     { name: 'LinkedIn', href: '#', icon: Linkedin },
-]
+];
 
 export default function ContactPage() {
+  const portfolioImages = PlaceHolderImages.filter(p => p.id.startsWith("portfolio-"));
+
   return (
-    <div className="container mx-auto px-4 py-16 sm:py-24 flex items-center justify-center min-h-[calc(100vh-10rem)]">
-      <Card className="w-full max-w-lg text-center animate-in fade-in-0 duration-500">
-        <CardHeader>
-          <CardTitle className="font-headline text-4xl md:text-5xl">Get In Touch</CardTitle>
-          <CardDescription className="text-lg pt-2">
-            I'm available for new projects and collaborations. Let's create something beautiful together.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-            <div className="flex flex-col items-center space-y-4">
-                <Button asChild variant="outline" size="lg" className="w-full max-w-xs">
-                    <a href="mailto:contact@ahmedfareed.com">
-                        <Mail className="mr-2 h-5 w-5" />
-                        contact@ahmedfareed.com
+    <div className="relative min-h-screen flex flex-col items-center justify-center text-center p-4">
+      <div className="absolute inset-0 z-0">
+        {portfolioImages.map((image, index) => (
+          <Image
+            key={image.id}
+            src={image.imageUrl}
+            alt=""
+            fill
+            className={`object-cover transition-opacity duration-[3000ms] ease-in-out opacity-0 animate-fade-in-out`}
+            style={{ animationDelay: `${index * 5}s` }}
+            aria-hidden="true"
+          />
+        ))}
+        <div className="absolute inset-0 bg-background/95"></div>
+      </div>
+      
+      <div className="relative z-10">
+        <a href="mailto:contact@ahmedfareed.com" className="text-base font-body block mb-4">
+          contact@ahmedfareed.com
+        </a>
+        <div className="flex justify-center items-center space-x-2 group">
+          <span className="text-muted-foreground/50">·</span>
+          <span className="text-muted-foreground/50">·</span>
+          <span className="text-muted-foreground/50">·</span>
+
+          <div className="absolute bottom-full mb-2 flex space-x-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+             {socialLinks.map((social) => (
+                <Button key={social.name} asChild variant="ghost" size="icon" className="w-8 h-8">
+                    <a href={social.href} target="_blank" rel="noopener noreferrer" aria-label={social.name}>
+                        <social.icon className="h-4 w-4 text-foreground" />
                     </a>
                 </Button>
-            </div>
-            <div className="flex justify-center space-x-4">
-                {socialLinks.map(social => (
-                     <Button key={social.name} asChild variant="ghost" size="icon">
-                        <a href={social.href} target="_blank" rel="noopener noreferrer" aria-label={social.name}>
-                            <social.icon className="h-6 w-6 text-muted-foreground hover:text-foreground" />
-                        </a>
-                    </Button>
-                ))}
-            </div>
-        </CardContent>
-      </Card>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

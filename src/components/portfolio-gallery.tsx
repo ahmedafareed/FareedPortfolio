@@ -3,8 +3,6 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { PortfolioCategory, portfolioCategories, getFullPortfolioImages } from '@/lib/data';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 
@@ -25,71 +23,63 @@ export default function PortfolioGallery() {
     setSelectedImage(image);
     setLightboxOpen(true);
   };
+  
+  const categories: (PortfolioCategory | 'All')[] = ['All', ...portfolioCategories];
 
   return (
-    <div className="container mx-auto px-4 py-16 sm:py-24">
-      <div className="text-center mb-12 animate-in fade-in-0 duration-500">
-        <h1 className="font-headline text-5xl md:text-6xl tracking-tight">Portfolio</h1>
-        <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-          A collection of my favorite moments captured through the lens.
-        </p>
-      </div>
-
-      <div className="flex justify-center flex-wrap gap-2 mb-12 animate-in fade-in-0 duration-500 delay-200">
-        <Button
-          variant={activeCategory === 'All' ? 'default' : 'outline'}
-          onClick={() => setActiveCategory('All')}
-          className={cn("bg-transparent", activeCategory === 'All' && "bg-primary text-primary-foreground")}
-        >
-          All
-        </Button>
-        {portfolioCategories.map((category) => (
-          <Button
-            key={category}
-            variant={activeCategory === category ? 'default' : 'outline'}
-            onClick={() => setActiveCategory(category)}
-            className={cn("bg-transparent", activeCategory === category && "bg-primary text-primary-foreground")}
-          >
-            {category}
-          </Button>
-        ))}
+    <div className="container mx-auto px-4 py-16 sm:py-24 min-h-screen">
+      <div className="sticky top-0 bg-background/80 backdrop-blur-sm z-10 py-4">
+        <div className="flex justify-center items-center space-x-4">
+            {categories.map((category) => (
+                <button
+                    key={category}
+                    onClick={() => setActiveCategory(category)}
+                    className={cn(
+                        "font-body tracking-widest transition-all duration-300",
+                        activeCategory === category ? "font-bold opacity-100" : "font-normal opacity-30 hover:opacity-100"
+                    )}
+                >
+                    {category.toUpperCase()}
+                </button>
+            ))}
+        </div>
       </div>
 
       <div
-        className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 sm:gap-6 space-y-4 sm:space-y-6"
+        className="columns-1 md:columns-2 lg:columns-3 gap-4"
       >
         {filteredImages.map((image, index) => (
           <div
             key={image.id}
-            className="break-inside-avoid animate-in fade-in-0 duration-500"
-            style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'backwards' }}
+            className="break-inside-avoid mb-4"
             onClick={() => openLightbox(image)}
           >
-            <Card className="overflow-hidden cursor-pointer group border-2 border-transparent hover:border-primary transition-all duration-300">
-              <CardContent className="p-0">
+            <div className="relative overflow-hidden cursor-pointer group">
                 <Image
                   src={image.imageUrl}
                   alt={image.description}
                   width={image.width}
                   height={image.height}
-                  className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-300"
+                  className={cn(
+                      "w-full h-auto object-cover transition-all duration-400 saturate-[.9] group-hover:saturate-100",
+                      image.aspectRatio === 'portrait' ? 'md:col-span-1' : ''
+                    )}
                   data-ai-hint={image.imageHint}
                 />
-              </CardContent>
-            </Card>
+              </div>
           </div>
         ))}
       </div>
 
       <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
-        <DialogContent className="max-w-4xl w-full p-2 bg-transparent border-0">
+        <DialogContent className="max-w-[85vw] max-h-[85vh] w-auto h-auto bg-transparent border-0 shadow-none flex items-center justify-center p-0">
           {selectedImage && (
             <Image
               src={selectedImage.imageUrl}
               alt={selectedImage.description}
               width={1600}
               height={1200}
-              className="w-full h-auto object-contain rounded-lg max-h-[90vh]"
+              className="w-auto h-auto object-contain max-w-[85vw] max-h-[85vh] rounded-lg"
               data-ai-hint={selectedImage.imageHint}
             />
           )}
