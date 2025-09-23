@@ -28,7 +28,7 @@ export default function Home() {
         const handleScroll = () => {
             const scrollTop = window.scrollY;
             const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-            const scrolled = (scrollTop / docHeight) * 100;
+            const scrolled = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
             setScrollPercentage(scrolled);
         };
 
@@ -52,14 +52,12 @@ export default function Home() {
             
             {/* SECTION 1: INTRODUCTION */}
             <ParallaxHero images={heroImages} />
-            <div className="h-screen bg-background" />
-
 
             {/* SECTION 2: PROOF */}
-            <section className="h-screen w-full flex items-center justify-center overflow-hidden relative">
+            <section className="h-screen w-full flex items-center justify-center overflow-hidden relative py-24">
                 <div className="w-full max-w-4xl mx-auto px-4">
                     {credentials.map((cred, index) => {
-                        const isAligned = scrollPercentage > 18 && scrollPercentage < 22;
+                        const isAligned = scrollPercentage > 5 && scrollPercentage < 15;
                         const initialTop = 10 + index * 20;
                         const initialLeft = 10 + (index % 2 === 0 ? index * 15 : 100 - index * 15 - 30);
                         const opacity = isAligned ? 1 : 0.3;
@@ -84,8 +82,6 @@ export default function Home() {
                     })}
                 </div>
             </section>
-            <div className="h-screen bg-background" />
-
 
             {/* SECTION 3: THE WORK */}
             <section className="w-full py-24 px-4 md:px-8 space-y-32">
@@ -122,31 +118,23 @@ export default function Home() {
                     </>
                 )}
             </section>
-            <div className="h-screen bg-background" />
-
 
             {/* SECTION 4: THE NUMBERS */}
             <StatsSection />
-            <div className="h-screen bg-background" />
-
             
             {/* SECTION 5: THE PERSONALITY */}
-            <section className="h-screen w-full relative flex items-center justify-center">
+            <section className="h-screen w-full relative flex items-center justify-center py-24">
                  {rhythmGalleryImages.length > 0 && <Image src={PlaceHolderImages.find(p => p.id === 'about-headshot')?.imageUrl || ''} alt="Self Portrait" fill className="object-cover" data-ai-hint="photographer workspace" />}
                 <div className="absolute inset-0 bg-black/50" />
                  <div className="relative z-10 text-white text-4xl md:text-6xl font-extralight text-center">
                     {personalityWords.map((word, index) => {
-                         const showWord = scrollPercentage > 53 + (index * 2);
+                         const showWord = scrollPercentage > 75 + (index * 2);
                          return (
                             <p key={word} className={cn("transition-opacity duration-1000", showWord ? "opacity-100" : "opacity-0")}>{word}</p>
                          )
                     })}
                 </div>
             </section>
-            <div className="h-screen bg-background" />
-
-            {/* SPACER SECTION 6 & 7 */}
-            <div className="h-[200vh] bg-background" />
 
             {/* SECTION 8: THE INVITATION */}
             <section className="h-screen w-full relative flex flex-col items-center justify-center text-center p-4">
