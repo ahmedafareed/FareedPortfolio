@@ -65,11 +65,19 @@ export default function LocationDot() {
             }
         }
         setSite(detectedSite);
-        // Build site-aware navigation items
-        const sitePrefix = detectedSite === 'travel' ? '/travel' : '/commercial';
+        // Determine if we're on a subdomain (production) or main domain (preview/dev)
+        let isSubdomain = false;
+        if (typeof window !== 'undefined') {
+            const host = window.location.hostname;
+            if (host.startsWith('commercial.') || host.startsWith('travel.')) {
+                isSubdomain = true;
+            }
+        }
+        // On subdomain: use root-relative links; on main domain: use prefix
+        const sitePrefix = isSubdomain ? '' : (detectedSite === 'travel' ? '/travel' : '/commercial');
         const siteNavItems = baseNavItems.map(item => ({
             ...item,
-            href: item.href === '' ? sitePrefix : `${sitePrefix}${item.href}`
+            href: sitePrefix + (item.href === '' ? '' : item.href)
         }));
         setNavItems(siteNavItems);
     }, [pathname]);
