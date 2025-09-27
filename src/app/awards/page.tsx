@@ -3,7 +3,7 @@ import AwardsList from '@/components/awards-list';
 
 export const metadata: Metadata = {
   title: 'Awards & Exhibitions | Ahmed Fareed',
-  description: 'A showcase of awards, publications, and exhibitions by photographer Ahmed Fareed.',
+  description: 'A showcase of awards, recognitions, and exhibitions by photographer Ahmed Fareed.',
 };
 
 export default function AwardsPage() {

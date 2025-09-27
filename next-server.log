@@ -1,0 +1,38 @@
+
+> nextn@0.1.0 dev
+> next dev --turbopack -p 9002 --port 9002
+
+   ▲ Next.js 15.3.3 (Turbopack)
+   - Local:        http://localhost:9002
+   - Network:      http://10.0.3.143:9002
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Compiled middleware in 465ms
+ ✓ Ready in 1428ms
+ ○ Compiling /admin/settings ...
+
+warn - The class `duration-[3000ms]` is ambiguous and matches multiple utilities.
+warn - If this is content and not a class, replace it with `duration-&lsqb;3000ms&rsqb;` to silence this warning.
+ ✓ Compiled /admin/settings in 6.5s
+ GET /admin/settings 200 in 6952ms
+ ○ Compiling /favicon.ico ...
+ ✓ Compiled /favicon.ico in 876ms
+ GET /favicon.ico?favicon.56766c03.ico 200 in 1137ms
+ ○ Compiling / ...
+ ✓ Compiled / in 2.2s
+ GET / 200 in 2448ms
+ ○ Compiling /about ...
+ ✓ Compiled /about in 2.3s
+ GET /about 200 in 3199ms
+ GET / 200 in 47ms
+ ○ Compiling /portfolio ...
+ ✓ Compiled /portfolio in 2.3s
+ GET /portfolio 200 in 2402ms
+ ✓ Compiled in 117ms
+ GET / 200 in 191ms
+ ○ Compiling /awards ...
+ ✓ Compiled /awards in 1822ms
+ GET /awards 200 in 1868ms
+ GET /awards 200 in 49ms
+[?25h
