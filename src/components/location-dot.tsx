@@ -46,39 +46,31 @@ export default function LocationDot() {
     // Detect site and build navigation items
     useEffect(() => {
         let detectedSite: 'travel' | 'commercial' = 'travel';
-        
-        // Check if we're on client side
         if (typeof window !== 'undefined') {
             try {
-                // First check subdomain
                 const host = window.location.hostname;
-                const parts = host.split('.');
-                if (parts[0] === 'commercial') {
+                // Check for subdomain in production
+                if (host.startsWith('commercial.')) {
                     detectedSite = 'commercial';
-                }
-                
-                // Then check path prefix
-                const pathFirst = pathname.split('/')[1];
-                if (pathFirst === 'commercial') {
-                    detectedSite = 'commercial';
-                } else if (pathFirst === 'travel') {
+                } else if (host.startsWith('travel.')) {
                     detectedSite = 'travel';
+                } else {
+                    // Fallback for dev: check path
+                    const pathFirst = pathname.split('/')[1];
+                    if (pathFirst === 'commercial') detectedSite = 'commercial';
+                    else if (pathFirst === 'travel') detectedSite = 'travel';
                 }
             } catch {
-                // Fallback to travel
                 detectedSite = 'travel';
             }
         }
-        
         setSite(detectedSite);
-        
         // Build site-aware navigation items
         const sitePrefix = detectedSite === 'travel' ? '/travel' : '/commercial';
         const siteNavItems = baseNavItems.map(item => ({
             ...item,
             href: item.href === '' ? sitePrefix : `${sitePrefix}${item.href}`
         }));
-        
         setNavItems(siteNavItems);
     }, [pathname]);
 
