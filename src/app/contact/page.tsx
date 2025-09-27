@@ -13,9 +13,9 @@ export const metadata: Metadata = {
 const contactMethods = [
     { 
         name: 'Email', 
-        href: 'mailto:hello@ahmedfareed.com', 
+        href: 'mailto:ahmedamfareed@gmail.com', 
         icon: Mail, 
-        label: 'hello@ahmedfareed.com',
+        label: 'ahmedamfareed@gmail.com',
         description: 'Drop me a line'
     },
     { 

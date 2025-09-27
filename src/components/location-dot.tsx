@@ -75,10 +75,13 @@ export default function LocationDot() {
         }
         // On subdomain: use root-relative links; on main domain: use prefix
         const sitePrefix = isSubdomain ? '' : (detectedSite === 'travel' ? '/travel' : '/commercial');
-        const siteNavItems = baseNavItems.map(item => ({
-            ...item,
-            href: sitePrefix + (item.href === '' ? '' : item.href)
-        }));
+        const siteNavItems = baseNavItems.map(item => {
+            // Home link: always '/' on subdomain, prefixed on main domain
+            if (item.label === 'Home') {
+                return { ...item, href: isSubdomain ? '/' : sitePrefix || '/' };
+            }
+            return { ...item, href: sitePrefix + item.href };
+        });
         setNavItems(siteNavItems);
     }, [pathname]);
 

@@ -17,7 +17,7 @@ const personalityWords = ['OBSERVER', 'STORYTELLER'];
 export default function Home() {
     const [scrollPercentage, setScrollPercentage] = useState(0);
     const [localTime, setLocalTime] = useState('');
-    const [contactEmail, setContactEmail] = useState('hello@ahmedfareed.com');
+    const [contactEmail, setContactEmail] = useState('ahmedamfareed@gmail.com');
     const [siteTagline, setSiteTagline] = useState('AVAILABLE FOR COMMISSIONS');
     const [displayTagline, setDisplayTagline] = useState('TRAVEL PHOTOGRAPHER');
     
