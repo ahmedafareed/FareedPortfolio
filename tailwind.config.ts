@@ -99,13 +99,18 @@ export default {
         'ken-burns': {
             '0%': { transform: 'scale(1) translate(0, 0)', },
             '100%': { transform: 'scale(1.05) translate(1%, -1%)', },
-        }
+        },
+        fadeUp: {
+          '0%': { opacity: '0', transform: 'translateY(8px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
         'fade-in-out': 'fade-in-out 15s infinite',
         'ken-burns': 'ken-burns 10s infinite alternate',
+        fadeUp: 'fadeUp 0.6s ease-out forwards',
       },
     },
   },

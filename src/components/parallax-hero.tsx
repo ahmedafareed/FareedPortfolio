@@ -14,11 +14,9 @@ export default function ParallaxHero({ images, tagline = 'AVAILABLE FOR COMMISSI
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
+    // Pin hero: do not rotate images. Always show the first image.
     useEffect(() => {
-        const interval = setInterval(() => {
-            setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
-        }, 5000); // 15s cycle / 3 images = 5s per image
-        return () => clearInterval(interval);
+        setCurrentImageIndex(0);
     }, [images.length]);
 
      useEffect(() => {
@@ -65,14 +63,11 @@ export default function ParallaxHero({ images, tagline = 'AVAILABLE FOR COMMISSI
                 <h1 className="text-5xl md:text-8xl text-white font-extralight tracking-widest">
                     AHMED FAREED
                 </h1>
-            </div>
-
-            {/* Bottom Right Corner */}
-            <div className="absolute bottom-10 right-10 z-10">
-                <p className="text-white text-xs font-light tracking-widest animate-pulse">
-                    {tagline}
+                <p className="text-white text-lg md:text-2xl font-light tracking-wider mt-4 opacity-90">
+                    {tagline || 'TRAVEL PHOTOGRAPHER'}
                 </p>
             </div>
+            {/* Removed bottom-right tagline to place it under the name */}
         </section>
     );
 }

@@ -1,11 +1,15 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { headers } from 'next/headers';
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
-export default function AdminPage() {
-  return (
+export default async function AdminPage() {
+    const h = await headers();
+    const site = h.get('x-site-key') || 'travel';
+    return (
     <div>
-        <h1 className="text-3xl font-headline mb-8">Admin Panel</h1>
+                <h1 className="text-3xl font-headline mb-2">Admin Panel</h1>
+                <p className="text-sm text-muted-foreground mb-6">Active site: <span className="font-mono">{site}</span></p>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <Card>
                 <CardHeader>

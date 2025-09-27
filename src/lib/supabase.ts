@@ -4,6 +4,7 @@ export type {
   PortfolioCategory, 
   PortfolioImage, 
   Award, 
+  Exhibition,
   SiteSetting, 
   PortfolioImageWithCategory
 } from './supabase-service';

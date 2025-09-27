@@ -1,3 +1,61 @@
+// --- Site Stats CRUD ---
+export type SiteStat = {
+  id: string;
+  site: string;
+  label: string;
+  value: number;
+  sort_order?: number;
+};
+
+export const getSiteStats = async (site: string): Promise<SiteStat[]> => {
+  const { data, error } = await supabase
+    .from('site_stats')
+    .select('*')
+    .eq('site', site)
+    .order('sort_order', { ascending: true });
+  if (error) {
+    console.error('Error fetching site stats:', error);
+    return [];
+  }
+  return data || [];
+};
+
+export const addSiteStat = async (site: string, label: string, value: number, sort_order?: number): Promise<SiteStat | null> => {
+  const { data, error } = await supabase
+    .from('site_stats')
+    .insert([{ site, label, value, sort_order }])
+    .select()
+    .single();
+  if (error) {
+    console.error('Error adding site stat:', error);
+    return null;
+  }
+  return data || null;
+};
+
+export const updateSiteStat = async (id: string, label: string, value: number, sort_order?: number): Promise<boolean> => {
+  const { error } = await supabase
+    .from('site_stats')
+    .update({ label, value, sort_order })
+    .eq('id', id);
+  if (error) {
+    console.error('Error updating site stat:', error);
+    return false;
+  }
+  return true;
+};
+
+export const deleteSiteStat = async (id: string): Promise<boolean> => {
+  const { error } = await supabase
+    .from('site_stats')
+    .delete()
+    .eq('id', id);
+  if (error) {
+    console.error('Error deleting site stat:', error);
+    return false;
+  }
+  return true;
+};
 import { createClient } from '@supabase/supabase-js';
 
 // Database types (simplified for now)
@@ -76,15 +134,49 @@ export type PortfolioImageWithCategory = PortfolioImage & {
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+if (!supabaseUrl || !supabaseAnonKey) {
+  // eslint-disable-next-line no-console
+  console.error('[Supabase] Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY environment variables. Data fetching will fail.');
+}
 
-// Service functions with basic error handling
+export const supabase = createClient(supabaseUrl || 'http://missing-url', supabaseAnonKey || 'missing-key');
+
+// Helper to resolve table names based on site key (multi-tenant via table duplication)
+// travel site uses original tables; commercial site uses "commercial_" prefixed duplicates.
+function table(site: string | undefined, base: string): string {
+  if (site === 'commercial') return `commercial_${base}`;
+  return base; // default travel
+}
+
+// Retrieve site key from environment (server side) or window (client header fallback not accessible here directly)
+// We'll allow callers to pass site explicitly; if omitted we default to 'travel'.
+function normalizeSite(site?: string | null): string {
+  if (site === 'commercial') return 'commercial';
+  return 'travel';
+}
+
+// Service functions with basic error handling; now site-aware
 export class PortfolioService {
+  // Optionally accept site key; callers can supply from request headers in server components or context.
+  static withSite(site?: string) {
+    const resolved = normalizeSite(site);
+    return {
+      getCategories: () => this.getCategories(resolved),
+      getImages: (categoryId?: string) => this.getImages(categoryId, resolved),
+      getHeroImage: () => this.getHeroImage(resolved),
+      getFeaturedImages: () => this.getFeaturedImages(resolved),
+      getAwards: () => this.getAwards(resolved),
+      getExhibitions: () => this.getExhibitions(resolved),
+      getSetting: (key: string) => this.getSetting(key, resolved),
+      getSettings: () => this.getSettings(resolved),
+    };
+  }
   // Categories
-  static async getCategories(): Promise<PortfolioCategory[]> {
+  static async getCategories(site?: string): Promise<PortfolioCategory[]> {
     try {
+      const t = table(site, 'portfolio_categories');
       const { data, error } = await supabase
-        .from('portfolio_categories')
+        .from(t)
         .select('*')
         .order('sort_order');
       
@@ -96,26 +188,32 @@ export class PortfolioService {
     }
   }
 
-  static async createCategory(category: Partial<PortfolioCategory>): Promise<PortfolioCategory | null> {
+  static async createCategory(category: Partial<PortfolioCategory>, site?: string): Promise<PortfolioCategory | null> {
     try {
+      const t = table(site, 'portfolio_categories');
       const { data, error } = await supabase
-        .from('portfolio_categories')
+        .from(t)
         .insert(category as any)
         .select()
         .single();
-      
-      if (error) throw error;
+      if (error) {
+        // Print error details for debugging
+        console.error('Error creating category:', error, JSON.stringify(error));
+        throw error;
+      }
       return data;
     } catch (error) {
-      console.error('Error creating category:', error);
+      // Print error object and stringified version
+      console.error('Error creating category:', error, JSON.stringify(error));
       return null;
     }
   }
 
-  static async updateCategory(id: string, updates: Partial<PortfolioCategory>): Promise<PortfolioCategory | null> {
+  static async updateCategory(id: string, updates: Partial<PortfolioCategory>, site?: string): Promise<PortfolioCategory | null> {
     try {
+      const t = table(site, 'portfolio_categories');
       const { data, error } = await supabase
-        .from('portfolio_categories')
+        .from(t)
         .update(updates as any)
         .eq('id', id)
         .select()
@@ -129,10 +227,11 @@ export class PortfolioService {
     }
   }
 
-  static async deleteCategory(id: string): Promise<boolean> {
+  static async deleteCategory(id: string, site?: string): Promise<boolean> {
     try {
+      const t = table(site, 'portfolio_categories');
       const { error } = await supabase
-        .from('portfolio_categories')
+        .from(t)
         .delete()
         .eq('id', id);
       
@@ -145,15 +244,17 @@ export class PortfolioService {
   }
 
   // Portfolio Images
-  static async getImages(categoryId?: string): Promise<PortfolioImageWithCategory[]> {
+  static async getImages(categoryId?: string, site?: string): Promise<PortfolioImageWithCategory[]> {
     try {
+      const t = table(site, 'portfolio_images');
+      const catTable = table(site, 'portfolio_categories');
       let query = supabase
-        .from('portfolio_images')
+        .from(t)
         .select(`
           *,
-          category:portfolio_categories(*)
+          category:${catTable}(*)
         `)
-        .order('sort_order');
+        .order('title', { ascending: false }); // Sort by last modified in descending order
 
       if (categoryId) {
         query = query.eq('category_id', categoryId);
@@ -162,55 +263,60 @@ export class PortfolioService {
       const { data, error } = await query;
       
       if (error) throw error;
-      return (data || []) as PortfolioImageWithCategory[];
+      return (data as unknown as PortfolioImageWithCategory[]) || [];
     } catch (error) {
-      console.error('Error fetching images:', error);
+      console.error('Error fetching images:', error, JSON.stringify(error));
       return [];
     }
   }
 
-  static async getHeroImage(): Promise<PortfolioImageWithCategory | null> {
+  static async getHeroImage(site?: string): Promise<PortfolioImageWithCategory | null> {
     try {
+      const t = table(site, 'portfolio_images');
+      const catTable = table(site, 'portfolio_categories');
       const { data, error } = await supabase
-        .from('portfolio_images')
+        .from(t)
         .select(`
           *,
-          category:portfolio_categories(*)
+          category:${catTable}(*)
         `)
         .eq('is_hero', true)
         .single();
       
       if (error && error.code !== 'PGRST116') throw error;
-      return (data as PortfolioImageWithCategory) || null;
+  return (data as unknown as PortfolioImageWithCategory) || null;
     } catch (error) {
       console.error('Error fetching hero image:', error);
       return null;
     }
   }
 
-  static async getFeaturedImages(): Promise<PortfolioImageWithCategory[]> {
+  static async getFeaturedImages(site?: string): Promise<PortfolioImageWithCategory[]> {
     try {
+      const t = table(site, 'portfolio_images');
+      const catTable = table(site, 'portfolio_categories');
       const { data, error } = await supabase
-        .from('portfolio_images')
+        .from(t)
         .select(`
           *,
-          category:portfolio_categories(*)
+          category:${catTable}(*)
         `)
         .eq('is_featured', true)
         .order('sort_order');
       
       if (error) throw error;
-      return (data || []) as PortfolioImageWithCategory[];
+  return (data as unknown as PortfolioImageWithCategory[]) || [];
     } catch (error) {
       console.error('Error fetching featured images:', error);
       return [];
     }
   }
 
-  static async createImage(image: Partial<PortfolioImage>): Promise<PortfolioImage | null> {
+  static async createImage(image: Partial<PortfolioImage>, site?: string): Promise<PortfolioImage | null> {
     try {
+      const t = table(site, 'portfolio_images');
       const { data, error } = await supabase
-        .from('portfolio_images')
+        .from(t)
         .insert(image as any)
         .select()
         .single();
@@ -223,10 +329,11 @@ export class PortfolioService {
     }
   }
 
-  static async updateImage(id: string, updates: Partial<PortfolioImage>): Promise<PortfolioImage | null> {
+  static async updateImage(id: string, updates: Partial<PortfolioImage>, site?: string): Promise<PortfolioImage | null> {
     try {
+      const t = table(site, 'portfolio_images');
       const { data, error } = await supabase
-        .from('portfolio_images')
+        .from(t)
         .update(updates as any)
         .eq('id', id)
         .select()
@@ -240,10 +347,11 @@ export class PortfolioService {
     }
   }
 
-  static async deleteImage(id: string): Promise<boolean> {
+  static async deleteImage(id: string, site?: string): Promise<boolean> {
     try {
+      const t = table(site, 'portfolio_images');
       const { error } = await supabase
-        .from('portfolio_images')
+        .from(t)
         .delete()
         .eq('id', id);
       
@@ -256,14 +364,19 @@ export class PortfolioService {
   }
 
   // Awards
-  static async getAwards(): Promise<Award[]> {
+  static async getAwards(site?: string): Promise<Award[]> {
     try {
+      const resolved = normalizeSite(site);
+      const t = table(resolved, 'awards');
+      // eslint-disable-next-line no-console
+      console.log(`[Supabase:getAwards] Query table=${t}`);
       const { data, error } = await supabase
-        .from('awards')
+        .from(t)
         .select('*')
         .order('year', { ascending: false });
-      
       if (error) throw error;
+      // eslint-disable-next-line no-console
+      console.log(`[Supabase:getAwards] rows=${data?.length || 0}`);
       return data || [];
     } catch (error) {
       console.error('Error fetching awards:', error);
@@ -271,10 +384,11 @@ export class PortfolioService {
     }
   }
 
-  static async createAward(award: Partial<Award>): Promise<Award | null> {
+  static async createAward(award: Partial<Award>, site?: string): Promise<Award | null> {
     try {
+      const t = table(site, 'awards');
       const { data, error } = await supabase
-        .from('awards')
+        .from(t)
         .insert(award as any)
         .select()
         .single();
@@ -287,10 +401,11 @@ export class PortfolioService {
     }
   }
 
-  static async updateAward(id: string, updates: Partial<Award>): Promise<Award | null> {
+  static async updateAward(id: string, updates: Partial<Award>, site?: string): Promise<Award | null> {
     try {
+      const t = table(site, 'awards');
       const { data, error } = await supabase
-        .from('awards')
+        .from(t)
         .update(updates as any)
         .eq('id', id)
         .select()
@@ -304,10 +419,11 @@ export class PortfolioService {
     }
   }
 
-  static async deleteAward(id: string): Promise<boolean> {
+  static async deleteAward(id: string, site?: string): Promise<boolean> {
     try {
+      const t = table(site, 'awards');
       const { error } = await supabase
-        .from('awards')
+        .from(t)
         .delete()
         .eq('id', id);
       
@@ -320,14 +436,18 @@ export class PortfolioService {
   }
 
   // Exhibitions
-  static async getExhibitions(): Promise<Exhibition[]> {
+  static async getExhibitions(site?: string): Promise<Exhibition[]> {
     try {
+      const resolved = normalizeSite(site);
+      const t = table(resolved, 'exhibitions');
+      // eslint-disable-next-line no-console
+      console.log(`[Supabase:getExhibitions] Query table=${t}`);
       const { data, error } = await supabase
-        .from('exhibitions')
+        .from(t)
         .select('*')
         .order('sort_order', { ascending: true });
-      
       if (error) throw error;
+      console.log(`[Supabase:getExhibitions] rows=${data?.length || 0}`);
       return data || [];
     } catch (error) {
       console.error('Error fetching exhibitions:', error);
@@ -335,10 +455,11 @@ export class PortfolioService {
     }
   }
 
-  static async createExhibition(exhibition: Omit<Exhibition, 'id' | 'created_at' | 'updated_at'>): Promise<Exhibition | null> {
+  static async createExhibition(exhibition: Omit<Exhibition, 'id' | 'created_at' | 'updated_at'>, site?: string): Promise<Exhibition | null> {
     try {
+      const t = table(site, 'exhibitions');
       const { data, error } = await supabase
-        .from('exhibitions')
+        .from(t)
         .insert(exhibition as any)
         .select()
         .single();
@@ -351,10 +472,11 @@ export class PortfolioService {
     }
   }
 
-  static async updateExhibition(id: string, updates: Partial<Exhibition>): Promise<Exhibition | null> {
+  static async updateExhibition(id: string, updates: Partial<Exhibition>, site?: string): Promise<Exhibition | null> {
     try {
+      const t = table(site, 'exhibitions');
       const { data, error } = await supabase
-        .from('exhibitions')
+        .from(t)
         .update(updates as any)
         .eq('id', id)
         .select()
@@ -368,10 +490,11 @@ export class PortfolioService {
     }
   }
 
-  static async deleteExhibition(id: string): Promise<boolean> {
+  static async deleteExhibition(id: string, site?: string): Promise<boolean> {
     try {
+      const t = table(site, 'exhibitions');
       const { error } = await supabase
-        .from('exhibitions')
+        .from(t)
         .delete()
         .eq('id', id);
       
@@ -384,10 +507,11 @@ export class PortfolioService {
   }
 
   // Site Settings
-  static async getSetting(key: string): Promise<SiteSetting | null> {
+  static async getSetting(key: string, site?: string): Promise<SiteSetting | null> {
     try {
+      const t = table(site, 'site_settings');
       const { data, error } = await supabase
-        .from('site_settings')
+        .from(t)
         .select('*')
         .eq('key', key)
         .single();
@@ -400,10 +524,11 @@ export class PortfolioService {
     }
   }
 
-  static async getSettings(): Promise<SiteSetting[]> {
+  static async getSettings(site?: string): Promise<SiteSetting[]> {
     try {
+      const t = table(site, 'site_settings');
       const { data, error } = await supabase
-        .from('site_settings')
+        .from(t)
         .select('*')
         .order('key');
       
@@ -415,7 +540,7 @@ export class PortfolioService {
     }
   }
 
-  static async setSetting(key: string, value: string, description?: string, type: string = 'text'): Promise<SiteSetting | null> {
+  static async setSetting(key: string, value: string, description?: string, type: string = 'text', site?: string): Promise<SiteSetting | null> {
     try {
       if (!key || typeof key !== 'string' || key.trim() === '') {
         throw new Error('Setting key must be a non-empty string');
@@ -432,8 +557,9 @@ export class PortfolioService {
         description,
         type: type || 'text'
       };
+      const t = table(site, 'site_settings');
       const { data, error } = await supabase
-        .from('site_settings')
+        .from(t)
         .upsert(upsertPayload as any, { onConflict: 'key' })
         .select()
         .single();
@@ -469,10 +595,11 @@ export class PortfolioService {
     }
   }
 
-  static async deleteSetting(key: string): Promise<boolean> {
+  static async deleteSetting(key: string, site?: string): Promise<boolean> {
     try {
+      const t = table(site, 'site_settings');
       const { error } = await supabase
-        .from('site_settings')
+        .from(t)
         .delete()
         .eq('key', key);
       

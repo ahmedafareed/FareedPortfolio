@@ -93,7 +93,7 @@ export default function AdminPortfolioPage() {
     setSaving(false);
   };
 
-  async function downscaleImage(file) {
+  async function downscaleImage(file: File) {
     return new Promise<File>((resolve) => {
       if (file.size <= 500 * 1024) return resolve(file);
       const img = new window.Image();
@@ -106,7 +106,9 @@ export default function AdminPortfolioPage() {
           canvas.width = img.width * scale;
           canvas.height = img.height * scale;
           const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          }
           canvas.toBlob((blob) => {
             if (!blob) return resolve(file);
             // If still >1mb, reduce quality
@@ -119,7 +121,7 @@ export default function AdminPortfolioPage() {
             }
           }, 'image/jpeg', 0.85);
         };
-        img.src = e.target.result as string;
+        img.src = (e?.target as FileReader | null)?.result as string;
       };
       reader.readAsDataURL(file);
     });
@@ -241,20 +243,76 @@ export default function AdminPortfolioPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {images.map(img => (
-                <div key={img.id} className="border rounded p-2">
-                  <div className="text-sm text-muted-foreground mb-1">{img.category?.display_name || 'Uncategorized'} · {img.aspect_ratio}</div>
-                  <div className="font-medium">{img.title}</div>
-                  <div className="text-xs break-all text-muted-foreground mb-2">{img.image_url}</div>
-                  <div className="flex gap-2 justify-end">
-                    <Button variant={img.is_featured ? 'secondary' : 'outline'} size="sm" onClick={() => setFeatured(img.id, !img.is_featured)}>
-                      {img.is_featured ? (<><Star className="mr-2 h-4 w-4"/> Featured</>) : (<><StarOff className="mr-2 h-4 w-4"/> Make Featured</>)}
-                    </Button>
-                    <Button variant={img.is_hero ? 'secondary' : 'outline'} size="sm" onClick={() => setHero(img.id)}>
-                      <Crown className="mr-2 h-4 w-4"/> {img.is_hero ? 'Hero' : 'Set Hero'}
-                    </Button>
+              {images
+                .sort((a, b) => {
+                  // Sort hero first, then featured, then by sort_order
+                  if (a.is_hero && !b.is_hero) return -1;
+                  if (!a.is_hero && b.is_hero) return 1;
+                  if (a.is_featured && !b.is_featured) return -1;
+                  if (!a.is_featured && b.is_featured) return 1;
+                  return (a.sort_order || 0) - (b.sort_order || 0);
+                })
+                .map(img => (
+                <div key={img.id} className="border rounded p-3 space-y-3">
+                  {/* Image Preview */}
+                  <div className="relative aspect-video rounded overflow-hidden bg-gray-100">
+                    <img 
+                      src={img.image_url} 
+                      alt={img.title} 
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                        (e.target as HTMLImageElement).nextElementSibling!.classList.remove('hidden');
+                      }}
+                    />
+                    <div className="hidden absolute inset-0 flex items-center justify-center text-gray-500 text-sm">
+                      Failed to load image
+                    </div>
+                    {/* Hero/Featured badges */}
+                    <div className="absolute top-2 left-2 flex gap-1">
+                      {img.is_hero && (
+                        <span className="bg-yellow-500 text-white px-2 py-1 text-xs rounded font-medium">
+                          HERO
+                        </span>
+                      )}
+                      {img.is_featured && (
+                        <span className="bg-blue-500 text-white px-2 py-1 text-xs rounded font-medium">
+                          FEATURED
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* Image Info */}
+                  <div>
+                    <div className="text-sm text-muted-foreground mb-1">{img.category?.display_name || 'Uncategorized'} · {img.aspect_ratio}</div>
+                    <div className="font-medium text-sm">{img.title}</div>
+                    <div className="text-xs text-muted-foreground mt-1 truncate">{img.image_url}</div>
+                  </div>
+                  
+                  {/* Action Buttons */}
+                  <div className="flex flex-col gap-2">
+                    <div className="flex gap-2">
+                      <Button 
+                        variant={img.is_featured ? 'secondary' : 'outline'} 
+                        size="sm" 
+                        className="flex-1"
+                        onClick={() => setFeatured(img.id, !img.is_featured)}
+                      >
+                        {img.is_featured ? (<><Star className="mr-1 h-3 w-3"/> Featured</>) : (<><StarOff className="mr-1 h-3 w-3"/> Feature</>)}
+                      </Button>
+                      <Button 
+                        variant={img.is_hero ? 'default' : 'outline'} 
+                        size="sm" 
+                        className="flex-1"
+                        onClick={() => setHero(img.id)}
+                        disabled={img.is_hero}
+                      >
+                        <Crown className="mr-1 h-3 w-3"/> {img.is_hero ? 'Hero' : 'Set Hero'}
+                      </Button>
+                    </div>
                     <Button variant="destructive" size="sm" onClick={() => remove(img.id)}>
-                      <Trash2 className="mr-2 h-4 w-4"/> Delete
+                      <Trash2 className="mr-1 h-3 w-3"/> Delete
                     </Button>
                   </div>
                 </div>

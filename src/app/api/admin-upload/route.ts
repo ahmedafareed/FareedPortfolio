@@ -1,16 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
+function table(site: string | undefined, base: string) {
+  return site === 'commercial' ? `commercial_${base}` : base;
+}
+
 // This API expects multipart/form-data with files[] and fields: title, aspect_ratio, category_id (optional)
 export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
-    const files = formData.getAll('files') as File[];
+  const files = formData.getAll('files') as File[];
     const title = (formData.get('title') as string) || '';
     const aspect = (formData.get('aspect_ratio') as string) as 'portrait' | 'landscape' | 'square';
     const categoryId = (formData.get('category_id') as string) || null;
+  const site = (formData.get('site') as string) || undefined;
 
     if (!files || files.length === 0) {
       return NextResponse.json({ message: 'No files uploaded' }, { status: 400 });
@@ -55,7 +60,7 @@ export async function POST(req: NextRequest) {
       const imageUrl = pub.publicUrl;
 
       const { data: inserted, error: insertErr } = await admin
-        .from('portfolio_images')
+        .from(table(site, 'portfolio_images'))
         .insert({
           title: title || file.name,
           description: null,

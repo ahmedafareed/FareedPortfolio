@@ -5,32 +5,34 @@ import Link from 'next/link';
 import { Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useState, useEffect } from "react";
 
-const navItems = [
-  { href: '/', label: 'Home', shape: 'circle' },
+// Base navigation items without site prefix
+const baseNavItems = [
+  { href: '', label: 'Home', shape: 'circle' },
   { href: '/portfolio', label: 'Portfolio', shape: 'filled-circle' },
   { href: '/about', label: 'About', shape: 'square' },
-    { href: '/awards', label: 'Awards & Exhibitions', shape: 'diamond' },
+  { href: '/awards', label: 'Awards & Exhibitions', shape: 'diamond' },
   { href: '/contact', label: 'Contact', shape: 'plus' },
 ];
 
 const Shape = ({ shape, className }: { shape: string; className?: string }) => {
-    // The foreground color is inverted by the mix-blend-difference, so we use a white color here.
-    const shapeColor = "bg-white"; 
-    const borderColor = "border-white";
-    const strokeColor = "text-white";
+    // Gold color for navigation dot
+    const shapeColor = "bg-yellow-500"; 
+    const borderColor = "border-yellow-500";
+    const strokeColor = "text-yellow-500";
 
     switch (shape) {
         case 'circle':
-            return <div className={cn("w-[6px] h-[6px] rounded-full border", borderColor, className)}></div>;
+            return <div className={cn("w-[10px] h-[10px] rounded-full border", borderColor, className)}></div>;
         case 'filled-circle':
-            return <div className={cn("w-[6px] h-[6px] rounded-full", shapeColor, className)}></div>;
+            return <div className={cn("w-[10px] h-[10px] rounded-full", shapeColor, className)}></div>;
         case 'square':
-            return <div className={cn("w-[6px] h-[6px]", shapeColor, className)}></div>;
+            return <div className={cn("w-[10px] h-[10px]", shapeColor, className)}></div>;
         case 'diamond':
-            return <div className={cn("w-[6px] h-[6px] transform rotate-45", shapeColor, className)}></div>;
+            return <div className={cn("w-[10px] h-[10px] transform rotate-45", shapeColor, className)}></div>;
         case 'plus':
-            return <Plus className={cn("w-[6px] h-[6px]", strokeColor, className)} />;
+            return <Plus className={cn("w-[10px] h-[10px]", strokeColor, className)} />;
         default:
             return null;
     }
@@ -38,20 +40,76 @@ const Shape = ({ shape, className }: { shape: string; className?: string }) => {
 
 export default function LocationDot() {
     const pathname = usePathname();
-    const currentItem = navItems.find(item => item.href === pathname);
+    const [site, setSite] = useState<'travel' | 'commercial'>('travel');
+    const [navItems, setNavItems] = useState(baseNavItems);
+
+    // Detect site and build navigation items
+    useEffect(() => {
+        let detectedSite: 'travel' | 'commercial' = 'travel';
+        
+        // Check if we're on client side
+        if (typeof window !== 'undefined') {
+            try {
+                // First check subdomain
+                const host = window.location.hostname;
+                const parts = host.split('.');
+                if (parts[0] === 'commercial') {
+                    detectedSite = 'commercial';
+                }
+                
+                // Then check path prefix
+                const pathFirst = pathname.split('/')[1];
+                if (pathFirst === 'commercial') {
+                    detectedSite = 'commercial';
+                } else if (pathFirst === 'travel') {
+                    detectedSite = 'travel';
+                }
+            } catch {
+                // Fallback to travel
+                detectedSite = 'travel';
+            }
+        }
+        
+        setSite(detectedSite);
+        
+        // Build site-aware navigation items
+        const sitePrefix = detectedSite === 'travel' ? '/travel' : '/commercial';
+        const siteNavItems = baseNavItems.map(item => ({
+            ...item,
+            href: item.href === '' ? sitePrefix : `${sitePrefix}${item.href}`
+        }));
+        
+        setNavItems(siteNavItems);
+    }, [pathname]);
+
+    // Find current item - handle both exact matches and homepage variations
+    const currentItem = navItems.find(item => {
+        if (item.href === pathname) return true;
+        
+        // Handle homepage: /travel, /commercial, or root /
+        if (item.label === 'Home') {
+            if (pathname === '/travel' || pathname === '/commercial') return true;
+            if (pathname === '/' && site === 'travel') return true;
+        }
+        
+        return false;
+    });
 
     return (
-        <div className="fixed top-10 left-10 z-50 mix-blend-difference">
+        <div className="fixed top-10 left-10 z-50">
             <Popover>
                 <PopoverTrigger asChild>
-                    <button className="flex items-center justify-center w-6 h-6" aria-label="Open navigation menu">
-                        {currentItem && <Shape shape={currentItem.shape} />}
+                    <button className="flex items-center justify-center w-6 h-6 group" aria-label="Open navigation menu">
+                        <div className="relative">
+                            {currentItem && <Shape shape={currentItem.shape} className="animate-pulse group-hover:animate-ping transition-all duration-300" />}
+                            <div className="absolute inset-0 rounded-full bg-yellow-500 opacity-20 animate-ping group-hover:opacity-40"></div>
+                        </div>
                     </button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-2 bg-white border border-border shadow-lg" side="bottom" align="start">
                     <nav>
                         <ul>
-                            {navItems.map(item => (
+                            {navItems.map((item) => (
                                 <li key={item.href}>
                                     <Link href={item.href} className="flex items-center gap-4 px-3 py-2 text-sm font-body text-black hover:bg-gray-100 rounded-sm">
                                         <Shape shape={item.shape} />

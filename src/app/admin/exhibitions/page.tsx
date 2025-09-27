@@ -168,7 +168,7 @@ export default function AdminExhibitionsPage() {
                         {exhibition.venue} • {exhibition.location}
                       </div>
                       <div className="text-sm text-muted-foreground mb-2">
-                        {monthNames[exhibition.month - 1]} {exhibition.year}
+                        {monthNames[((exhibition.month ? parseInt(exhibition.month as any, 10) : 1) - 1)]} {exhibition.year}
                       </div>
                       {exhibition.description && (
                         <div className="text-sm text-gray-600 mt-2">
