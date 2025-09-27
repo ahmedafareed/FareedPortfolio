@@ -1,8 +1,6 @@
+"use client";
+
 import { useState, useEffect } from 'react';
-"use client";
-
-"use client";
-
 import Image from 'next/image';
 import ParallaxHero from '@/components/parallax-hero';
 import StatsSection from '@/components/stats-section';
