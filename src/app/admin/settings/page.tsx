@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PortfolioService, type PortfolioImageWithCategory, type SiteSetting } from "@/lib/supabase";
 import { getSiteStats, addSiteStat, updateSiteStat, deleteSiteStat, SiteStat } from "@/lib/supabase-service";
+import AdminClientUploader from '@/components/admin-client-uploader';
 
 export default function AdminSettingsPage() {
   const [images, setImages] = useState<PortfolioImageWithCategory[]>([]);
@@ -165,6 +166,8 @@ export default function AdminSettingsPage() {
           </div>
         </CardContent>
       </Card>
+
+      <AdminClientUploader site="travel" />
 
       <Card>
         <CardHeader>

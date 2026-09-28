@@ -6,5 +6,6 @@ export type {
   Award, 
   Exhibition,
   SiteSetting, 
+  ClientLogo,
   PortfolioImageWithCategory
 } from './supabase-service';

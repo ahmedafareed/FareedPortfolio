@@ -15,6 +15,13 @@ export default {
         code: ['monospace'],
       },
       colors: {
+        ink: 'var(--ink)',
+        paper: 'var(--paper)',
+        'text-muted': 'var(--text-muted)',
+        'text-secondary': 'var(--text-secondary)',
+        'border-warm': 'var(--border-warm)',
+        'text-faint': 'var(--text-faint)',
+        'accent-blue': 'var(--accent-blue)',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {

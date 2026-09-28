@@ -2,17 +2,20 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useLocale } from '@/components/locale-provider';
 
 type HeroImage = { id: string; imageUrl: string; description: string; imageHint?: string };
 
 interface ParallaxHeroProps {
     images: HeroImage[];
     tagline?: string;
+    featuredTitle?: string;
 }
 
-export default function ParallaxHero({ images, tagline = 'AVAILABLE FOR COMMISSIONS' }: ParallaxHeroProps) {
+export default function ParallaxHero({ images, tagline = 'AVAILABLE FOR COMMISSIONS', featuredTitle }: ParallaxHeroProps) {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+    const { dictionary } = useLocale();
 
     // Pin hero: do not rotate images. Always show the first image.
     useEffect(() => {
@@ -39,7 +42,7 @@ export default function ParallaxHero({ images, tagline = 'AVAILABLE FOR COMMISSI
             {images.map((image, index) => (
                 <div
                     key={image.id}
-                    className="absolute inset-0 transition-opacity duration-[3000ms] ease-in-out"
+                    className="absolute inset-0 motion-safe-parallax"
                     style={{ 
                         opacity: index === currentImageIndex ? 1 : 0,
                         transform: `translate(${parallaxX}px, ${parallaxY}px) scale(1.05)`,
@@ -48,7 +51,7 @@ export default function ParallaxHero({ images, tagline = 'AVAILABLE FOR COMMISSI
                 >
                     <Image
                         src={image.imageUrl}
-                        alt={image.description}
+                        alt={image.imageHint || image.description}
                         fill
                         className="object-cover"
                         priority={index === 0}
@@ -56,18 +59,16 @@ export default function ParallaxHero({ images, tagline = 'AVAILABLE FOR COMMISSI
                     />
                 </div>
             ))}
-            <div className="absolute inset-0 bg-black/30"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent" aria-hidden="true"></div>
 
-            {/* Center Element */}
-            <div className="relative z-10 text-center">
-                <h1 className="text-5xl md:text-8xl text-white font-extralight tracking-widest">
-                    AHMED FAREED
-                </h1>
-                <p className="text-white text-lg md:text-2xl font-light tracking-wider mt-4 opacity-90">
-                    {tagline || 'TRAVEL PHOTOGRAPHER'}
-                </p>
+            <div className="absolute inset-x-0 bottom-0 z-10 px-5 pb-12 text-white md:px-16 md:pb-20">
+                <p className="mb-5 text-xs uppercase tracking-[0.22em] text-white/75">{dictionary.hero.available}</p>
+                <h1 className="max-w-4xl font-headline text-[clamp(3.5rem,8vw,5.75rem)] font-medium leading-[0.92]">{dictionary.hero.story}</h1>
+                <div className="mt-8 flex flex-wrap items-end justify-between gap-6">
+                    <p className="text-sm uppercase tracking-[0.18em] text-white/75">AHMED FAREED - {tagline || 'TRAVEL PHOTOGRAPHER'}</p>
+                    {featuredTitle && <p className="max-w-xs border-l border-white/50 pl-4 text-sm text-white/80"><span className="mb-1 block text-[10px] uppercase tracking-[0.2em] text-white/55">{dictionary.hero.featured}</span>{featuredTitle}</p>}
+                </div>
             </div>
-            {/* Removed bottom-right tagline to place it under the name */}
         </section>
     );
 }

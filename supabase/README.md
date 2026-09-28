@@ -23,6 +23,21 @@ SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key # required for uploads
 2. Copy and paste the contents of `schema.sql` 
 3. Run the SQL to create all necessary tables, indexes, and policies
 
+### 3.1 Add Spanish and Catalan Content
+1. Run `content_translations.sql` after the main schema.
+2. Insert translated public values using the original row UUID and one of the supported locales: `es` or `ca`.
+3. Use `entity_type` values `category`, `image`, `award`, `exhibition`, `setting`, or `stat`, and store one field per row, such as `display_name`, `title`, `description`, `event`, `venue`, `location`, `value`, or `label`.
+4. Existing English content remains the fallback when a translated field is not present.
+
+Example:
+
+```sql
+insert into public.content_translations (site, locale, entity_type, entity_id, field, value)
+values ('commercial', 'es', 'category', 'CATEGORY_UUID_HERE', 'display_name', 'Eventos');
+```
+
+The public locale routes are `/es/travel`, `/es/commercial`, `/ca/travel`, and `/ca/commercial`. Existing English routes remain unchanged.
+
 ### 4. Seed Initial Data
 1. Copy and paste the contents of `seed.sql` in the SQL Editor
 2. Run the SQL to populate initial categories and settings

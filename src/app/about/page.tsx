@@ -3,19 +3,24 @@ import Image from "next/image";
 import Timeline from "@/components/timeline";
 import { PortfolioService } from "@/lib/supabase";
 import { headers } from 'next/headers';
+import { getRequestLocale } from '@/lib/i18n-server';
+import { getDictionary } from '@/lib/i18n';
 
-export const metadata: Metadata = {
-  title: "About Me | Ahmed Fareed",
-  description: "Learn about Ahmed Fareed.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getRequestLocale();
+  const dictionary = getDictionary(locale);
+  return { title: `${dictionary.pages.about} | Ahmed Fareed`, description: dictionary.pages.about };
+}
 
 export default async function AboutPage() {
   const h = await headers();
+  const locale = await getRequestLocale();
+  const dictionary = getDictionary(locale);
   const site = (h.get('x-site-key') === 'commercial') ? 'commercial' : 'travel';
   // Get about description and headshot from settings
   const [headshotSetting, aboutDescriptionSetting] = await Promise.all([
     PortfolioService.getSetting('about_headshot_id', site),
-    PortfolioService.getSetting('about_description', site),
+    PortfolioService.getSetting('about_description', site, locale),
   ]);
 
   let headshotId = headshotSetting?.value;
@@ -60,7 +65,7 @@ export default async function AboutPage() {
                   />
               )}
             </div>
-            <p className="text-[18px] font-body font-bold mb-4">Ahmed Fareed</p>
+            <p className="text-[18px] font-body font-bold mb-4">{dictionary.pages.about} · Ahmed Fareed</p>
             <p className="text-[15px] leading-[2.2] mb-8">
               {aboutDescription}
             </p>

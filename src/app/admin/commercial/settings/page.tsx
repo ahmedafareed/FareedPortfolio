@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { PortfolioService } from '@/lib/supabase';
 import { getSiteStats, addSiteStat, updateSiteStat, deleteSiteStat, SiteStat } from '@/lib/supabase-service';
 import { Loader2 } from 'lucide-react';
+import AdminClientUploader from '@/components/admin-client-uploader';
 
 
 const SITE = 'commercial';
@@ -130,6 +131,7 @@ export default function CommercialSettingsPage() {
           </div>
         </CardContent>
       </Card>
+      <AdminClientUploader site={SITE} />
 
       <Card>
         <CardHeader>

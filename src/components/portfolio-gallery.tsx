@@ -5,10 +5,12 @@ import Image from 'next/image';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import { PortfolioService, type PortfolioImageWithCategory, type PortfolioCategory as Category } from '@/lib/supabase';
+import { useLocale } from '@/components/locale-provider';
 
 type FullImage = PortfolioImageWithCategory & { width: number; height: number };
 
 export default function PortfolioGallery() {
+  const { locale, dictionary } = useLocale();
   const [categories, setCategories] = useState<Array<{ id: string; display_name: string }>>([]);
   const [activeCategory, setActiveCategory] = useState<string | 'All'>('All');
   const [images, setImages] = useState<FullImage[]>([]);
@@ -20,15 +22,19 @@ export default function PortfolioGallery() {
     try {
       const host = window.location.hostname;
       const parts = host.split('.');
-      if (parts[0] === 'commercial') site = 'commercial';
+      if (parts[0] === 'commercial' || parts.includes('commercial')) site = 'commercial';
       if (site === 'travel') {
         const firstSeg = window.location.pathname.split('/')[1];
-        if (firstSeg === 'commercial') site = 'commercial';
+        if (firstSeg === 'commercial' || window.location.pathname.split('/').includes('commercial')) site = 'commercial';
       }
     } catch {}
-    const [cats, imgs] = await Promise.all([
+    const [rawCats, rawImgs] = await Promise.all([
       PortfolioService.getCategories(site),
       PortfolioService.getImages(undefined, site),
+    ]);
+    const [cats, imgs] = await Promise.all([
+      PortfolioService.localizeRecords(rawCats, site, locale, 'category', ['name', 'display_name', 'description']),
+      PortfolioService.localizeRecords(rawImgs, site, locale, 'image', ['title', 'description', 'alt_text']),
     ]);
     setCategories(cats.map(c => ({ id: c.id, display_name: c.display_name })));
     setImages((imgs || []).map(i => ({
@@ -38,7 +44,7 @@ export default function PortfolioGallery() {
     })) as FullImage[]);
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [locale]);
 
   const filtered = activeCategory === 'All' 
     ? images.sort((a, b) => a.sort_order - b.sort_order) // Ensure row-wise order
@@ -62,7 +68,7 @@ export default function PortfolioGallery() {
                   : 'font-normal opacity-30 hover:opacity-100'
               )}
             >
-              ALL
+              {dictionary.pages.portfolioAll.toUpperCase()}
             </button>
             {categories.map((c) => (
               <button

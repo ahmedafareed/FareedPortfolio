@@ -2,20 +2,32 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
-import LocationDot from '@/components/location-dot';
+import SiteHeader from '@/components/site-header';
+import LocaleProvider from '@/components/locale-provider';
+import { headers } from 'next/headers';
+import { isLocale, type Locale } from '@/lib/i18n';
+import { getDictionary } from '@/lib/i18n';
 
-export const metadata: Metadata = {
-  title: 'Ahmed Fareed | Photographer',
-  description: 'Portfolio of photographer Ahmed Fareed, specializing in weddings, portraits, and landscapes.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const localeHeader = (await headers()).get('x-locale');
+  const locale: Locale = isLocale(localeHeader) ? localeHeader : 'en';
+  const descriptions = {
+    en: 'Portfolio of photographer Ahmed Fareed, specializing in weddings, portraits, and landscapes.',
+    es: 'Portafolio del fotógrafo Ahmed Fareed, especializado en bodas, retratos y paisajes.',
+    ca: 'Portafoli del fotògraf Ahmed Fareed, especialitzat en casaments, retrats i paisatges.',
+  };
+  return { title: 'Ahmed Fareed | Photographer', description: descriptions[locale] };
+}
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const localeHeader = (await headers()).get('x-locale');
+  const locale: Locale = isLocale(localeHeader) ? localeHeader : 'en';
   return (
-    <html lang="en" className="!scroll-smooth" suppressHydrationWarning>
+    <html lang={locale} className="!scroll-smooth" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -29,10 +41,12 @@ export default function RootLayout({
           'min-h-screen bg-background font-body antialiased',
         )}
       >
-        <LocationDot />
-        <div className="relative flex min-h-screen">
-          <main className="flex-1">{children}</main>
-        </div>
+        <LocaleProvider locale={locale}>
+          <div className="relative flex min-h-screen">
+            <SiteHeader />
+            <main className="flex-1">{children}</main>
+          </div>
+        </LocaleProvider>
         <Toaster />
       </body>
     </html>

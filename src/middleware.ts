@@ -1,4 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { isLocale, type Locale } from '@/lib/i18n';
+
+function getLocale(pathname: string): Locale {
+    const firstSegment = pathname.split('/')[1];
+    return isLocale(firstSegment) ? firstSegment : 'en';
+}
+
+function removeLocalePrefix(pathname: string, locale: Locale) {
+    if (locale === 'en') return pathname;
+    const stripped = pathname.slice(locale.length + 1);
+    return stripped ? (stripped.startsWith('/') ? stripped : `/${stripped}`) : '/';
+}
 
 // Extract first subdomain (e.g., travel/commercial) if present
 function getSiteKey(host?: string | null): string {
@@ -13,26 +25,36 @@ function getSiteKey(host?: string | null): string {
 
 export function middleware(req: NextRequest) {
     const { pathname } = req.nextUrl;
+    const locale = getLocale(pathname);
+    const routedPathname = removeLocalePrefix(pathname, locale);
     const host = req.headers.get('host') || '';
     let siteKey = getSiteKey(host);
 
     // Path prefix fallback (no subdomain) e.g. /commercial or /travel
     if (siteKey === 'travel') {
-        if (pathname.startsWith('/commercial')) siteKey = 'commercial';
-        else if (pathname.startsWith('/travel')) siteKey = 'travel';
+        if (routedPathname.startsWith('/commercial')) siteKey = 'commercial';
+        else if (routedPathname.startsWith('/travel')) siteKey = 'travel';
     }
 
     // (Temporarily) disable apex redirect to avoid loops in dev / multi-host environments
     // If needed in production, reintroduce with an env flag check.
 
-    const response = NextResponse.next();
+    let response: NextResponse;
+    if (locale === 'en') {
+        response = NextResponse.next();
+    } else {
+        const rewriteUrl = req.nextUrl.clone();
+        rewriteUrl.pathname = routedPathname;
+        response = NextResponse.rewrite(rewriteUrl);
+    }
     response.headers.set('x-site-key', siteKey);
+    response.headers.set('x-locale', locale);
 
     // Allow access to login and login API without auth
-    if (pathname.startsWith('/login') || pathname.startsWith('/api/admin-login')) return response;
+    if (routedPathname.startsWith('/login') || routedPathname.startsWith('/api/admin-login')) return response;
 
     // Protect admin APIs: require admin session cookie
-    if (pathname.startsWith('/api/admin-upload') || pathname.startsWith('/api/admin-hero') || pathname.startsWith('/api/admin-import')) {
+    if (routedPathname.startsWith('/api/admin-upload') || routedPathname.startsWith('/api/admin-client-logo') || routedPathname.startsWith('/api/admin-hero') || routedPathname.startsWith('/api/admin-import')) {
         const session = req.cookies.get('admin_session')?.value;
         if (session === 'true') {
             return response;
@@ -40,7 +62,7 @@ export function middleware(req: NextRequest) {
         return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    if (pathname.startsWith('/admin')) {
+    if (routedPathname.startsWith('/admin')) {
         // 1) Cookie-based session (works in browsers without Basic Auth support)
         const session = req.cookies.get('admin_session')?.value;
         if (session === 'true') {
@@ -61,7 +83,7 @@ export function middleware(req: NextRequest) {
 
         // Redirect to login page
         const url = req.nextUrl.clone();
-        url.pathname = '/login';
+        url.pathname = locale === 'en' ? '/login' : `/${locale}/login`;
         url.searchParams.set('next', pathname);
         return NextResponse.redirect(url);
     }
@@ -75,10 +97,15 @@ export const config = {
         '/travel/:path*',
         '/commercial',
         '/commercial/:path*',
+        '/es',
+        '/es/:path*',
+        '/ca',
+        '/ca/:path*',
         '/admin/:path*',
         '/login',
         '/api/admin-login',
         '/api/admin-upload',
+        '/api/admin-client-logo',
         '/api/admin-hero',
         '/api/admin-import'
     ],

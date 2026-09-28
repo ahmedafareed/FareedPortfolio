@@ -57,6 +57,7 @@ export const deleteSiteStat = async (id: string): Promise<boolean> => {
   return true;
 };
 import { createClient } from '@supabase/supabase-js';
+import type { Locale } from '@/lib/i18n';
 
 // Database types (simplified for now)
 export interface PortfolioCategory {
@@ -121,6 +122,32 @@ export interface SiteSetting {
   value: string | null;
   description: string | null;
   type: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ClientLogo {
+  id: string;
+  site: 'travel' | 'commercial';
+  title: string;
+  image_url: string;
+  storage_path: string | null;
+  alt_text: string | null;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export type TranslationEntityType = 'category' | 'image' | 'award' | 'exhibition' | 'setting' | 'stat' | 'client_logo';
+
+export interface ContentTranslation {
+  id: string;
+  site: 'travel' | 'commercial';
+  locale: Exclude<Locale, 'en'>;
+  entity_type: TranslationEntityType;
+  entity_id: string;
+  field: string;
+  value: string;
   created_at: string;
   updated_at: string;
 }
@@ -507,7 +534,7 @@ export class PortfolioService {
   }
 
   // Site Settings
-  static async getSetting(key: string, site?: string): Promise<SiteSetting | null> {
+  static async getSetting(key: string, site?: string, locale: Locale = 'en'): Promise<SiteSetting | null> {
     try {
       const t = table(site, 'site_settings');
       const { data, error } = await supabase
@@ -517,7 +544,10 @@ export class PortfolioService {
         .single();
       
       if (error && error.code !== 'PGRST116') throw error;
-      return data || null;
+      if (!data || locale === 'en') return data || null;
+      const translated = await this.getTranslations(normalizeSite(site), locale, 'setting', [data.id]);
+      const value = translated.find(item => item.field === 'value')?.value;
+      return value === undefined ? data : { ...data, value };
     } catch (error) {
       console.error('Error fetching setting:', error);
       return null;
@@ -538,6 +568,65 @@ export class PortfolioService {
       console.error('Error fetching settings:', error);
       return [];
     }
+  }
+
+  static async getClientLogos(site?: string): Promise<ClientLogo[]> {
+    try {
+      const { data, error } = await supabase
+        .from('client_logos')
+        .select('*')
+        .eq('site', normalizeSite(site))
+        .order('sort_order', { ascending: true })
+        .order('created_at', { ascending: true });
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Error fetching client logos:', error);
+      return [];
+    }
+  }
+
+  static async getTranslations(
+    site: string,
+    locale: Exclude<Locale, 'en'>,
+    entityType: TranslationEntityType,
+    entityIds?: string[],
+  ): Promise<ContentTranslation[]> {
+    try {
+      let query = supabase
+        .from('content_translations')
+        .select('*')
+        .eq('site', normalizeSite(site))
+        .eq('locale', locale)
+        .eq('entity_type', entityType);
+      if (entityIds?.length) query = query.in('entity_id', entityIds);
+      const { data, error } = await query;
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Error fetching translations:', error);
+      return [];
+    }
+  }
+
+  static async localizeRecords<T extends { id: string }>(
+    records: T[],
+    site: string,
+    locale: Locale,
+    entityType: TranslationEntityType,
+    fields: string[],
+  ): Promise<T[]> {
+    if (locale === 'en' || records.length === 0) return records;
+    const translations = await this.getTranslations(site, locale, entityType, records.map(record => record.id));
+    const values = new Map(translations.map(translation => [`${translation.entity_id}:${translation.field}`, translation.value]));
+    return records.map(record => {
+      const localized = { ...record } as Record<string, unknown>;
+      fields.forEach(field => {
+        const value = values.get(`${record.id}:${field}`);
+        if (value !== undefined) localized[field] = value;
+      });
+      return localized as T;
+    });
   }
 
   static async setSetting(key: string, value: string, description?: string, type: string = 'text', site?: string): Promise<SiteSetting | null> {

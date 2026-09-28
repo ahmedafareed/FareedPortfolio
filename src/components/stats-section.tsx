@@ -2,7 +2,8 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { getSiteStats, SiteStat } from '@/lib/supabase-service';
+import { getSiteStats, SiteStat, PortfolioService } from '@/lib/supabase-service';
+import { useLocale } from '@/components/locale-provider';
 
 const AnimatedNumber = ({ target }: { target: number }) => {
     const [current, setCurrent] = useState(0);
@@ -28,6 +29,7 @@ const AnimatedNumber = ({ target }: { target: number }) => {
 }
 
 export default function StatsSection() {
+    const { locale } = useLocale();
     const [isVisible, setIsVisible] = useState(false);
     const [stats, setStats] = useState<SiteStat[]>([]);
     const sectionRef = useRef<HTMLDivElement>(null);
@@ -58,14 +60,14 @@ export default function StatsSection() {
         try {
             const host = window.location.hostname;
             const parts = host.split('.');
-            if (parts[0] === 'commercial') site = 'commercial';
+            if (parts[0] === 'commercial' || parts.includes('commercial')) site = 'commercial';
             if (site === 'travel') {
                 const firstSeg = window.location.pathname.split('/')[1];
-                if (firstSeg === 'commercial') site = 'commercial';
+                if (firstSeg === 'commercial' || window.location.pathname.split('/').includes('commercial')) site = 'commercial';
             }
         } catch {}
-        getSiteStats(site).then(setStats);
-    }, []);
+        getSiteStats(site).then(stats => PortfolioService.localizeRecords(stats, site, locale, 'stat', ['label']).then(setStats));
+    }, [locale]);
 
     return (
         <section ref={sectionRef} className="min-h-[50vh] w-full flex items-center justify-center text-center py-10 md:py-14 transition-opacity duration-1000" style={{ opacity: isVisible ? 1 : 0.1 }}>

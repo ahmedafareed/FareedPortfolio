@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
 import AwardsList from '@/components/awards-list';
+import { getRequestLocale } from '@/lib/i18n-server';
+import { getDictionary } from '@/lib/i18n';
 
-export const metadata: Metadata = {
-  title: 'Awards & Exhibitions | Ahmed Fareed',
-  description: 'A showcase of awards, recognitions, and exhibitions by photographer Ahmed Fareed.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+        const dictionary = getDictionary(await getRequestLocale());
+        return { title: `${dictionary.pages.awards} | Ahmed Fareed`, description: dictionary.recognition.achievements };
+}
 
 export default function AwardsPage() {
     return (

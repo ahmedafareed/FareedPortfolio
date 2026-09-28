@@ -3,6 +3,7 @@
 import { PortfolioService, type Award, type Exhibition } from '@/lib/supabase';
 import Image from 'next/image';
 import { useEffect, useState, useRef } from 'react';
+import { useLocale } from '@/components/locale-provider';
 
 export default function AwardsList() {
     const [awards, setAwards] = useState<Award[]>([]);
@@ -16,6 +17,9 @@ export default function AwardsList() {
     const [exhibitionsVisible, setExhibitionsVisible] = useState(false);
     const [awardsAnimKey, setAwardsAnimKey] = useState(0);
     const [exhibitionsAnimKey, setExhibitionsAnimKey] = useState(0);
+    const [awardOffset, setAwardOffset] = useState(0);
+    const [exhibitionOffset, setExhibitionOffset] = useState(0);
+    const { locale, dictionary } = useLocale();
 
     useEffect(() => {
         const loadData = async () => {
@@ -24,15 +28,19 @@ export default function AwardsList() {
             try {
                 const host = window.location.hostname;
                 const parts = host.split('.');
-                if (parts[0] === 'commercial') site = 'commercial';
+                if (parts[0] === 'commercial' || parts.includes('commercial')) site = 'commercial';
                 if (site === 'travel') {
                     const firstSeg = window.location.pathname.split('/')[1];
-                    if (firstSeg === 'commercial') site = 'commercial';
+                    if (firstSeg === 'commercial' || window.location.pathname.split('/').includes('commercial')) site = 'commercial';
                 }
             } catch {}
-            const [awardsData, exhibitionsData] = await Promise.all([
+            const [awardsDataRaw, exhibitionsDataRaw] = await Promise.all([
                 PortfolioService.getAwards(site),
-                PortfolioService.getExhibitions(site)
+                PortfolioService.getExhibitions(site),
+            ]);
+            const [awardsData, exhibitionsData] = await Promise.all([
+                PortfolioService.localizeRecords(awardsDataRaw, site, locale, 'award', ['title', 'event', 'description']),
+                PortfolioService.localizeRecords(exhibitionsDataRaw, site, locale, 'exhibition', ['title', 'venue', 'location', 'description']),
             ]);
             setAwards(awardsData.sort((a, b) => b.year - a.year));
             setExhibitions(exhibitionsData.sort((a, b) => {
@@ -44,7 +52,16 @@ export default function AwardsList() {
             setLoading(false);
         };
         loadData();
-    }, []);
+    }, [locale]);
+
+    useEffect(() => {
+        const awardsTimer = awards.length > 3 ? window.setInterval(() => setAwardOffset(offset => offset >= awards.length - 3 ? 0 : offset + 1), 4200) : undefined;
+        const exhibitionsTimer = exhibitions.length > 3 ? window.setInterval(() => setExhibitionOffset(offset => offset >= exhibitions.length - 3 ? 0 : offset + 1), 4200) : undefined;
+        return () => {
+            if (awardsTimer) window.clearInterval(awardsTimer);
+            if (exhibitionsTimer) window.clearInterval(exhibitionsTimer);
+        };
+    }, [awards.length, exhibitions.length]);
 
     // Scroll event-based animation trigger for both sections
     useEffect(() => {
@@ -83,33 +100,34 @@ export default function AwardsList() {
     if (loading) {
         return (
             <div className="flex justify-center items-center py-16">
-                <div className="text-gray-500">Loading awards and exhibitions...</div>
+                <div className="text-gray-500">{dictionary.recognition.loading}</div>
             </div>
         );
     }
     
     return (
-        <div className="space-y-12">
+        <div className="space-y-20">
             {/* Awards Section */}
             {awards.length > 0 && (
                 <div ref={awardsRef}>
                     <div className="mb-2">
-                        <span className="block text-lg font-semibold text-black text-center tracking-wide">Awards & Recognition</span>
+                        <span className="block text-lg font-semibold text-black text-center tracking-wide">{dictionary.recognition.awards}</span>
                     </div>
                     <h2
                         className={`text-2xl font-headline mb-8 text-center transition-all duration-700 text-black ${awardsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
                         key={awardsAnimKey}
                     >
-                        Recent Achievements
+                        {dictionary.recognition.achievements}
                     </h2>
-                    <ul>
+                    <div className="h-[264px] overflow-hidden">
+                    <ul className="transition-transform duration-1000 ease-in-out" style={{ transform: `translateY(-${awardOffset * 88}px)` }}>
                         {awards.map((award, idx) => {
                             const yearDiff = currentYear - award.year;
                             const opacity = yearDiff > 5 ? 0.5 : 1 - (yearDiff * 0.1);
                             return (
                                 <li
                                     key={award.id}
-                                    className={`group relative flex flex-col md:flex-row justify-between items-start md:items-center py-[20px] border-b border-border last:border-b-0 transition-all duration-700 ${awardsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+                                    className={`group relative flex min-h-[88px] flex-col md:flex-row justify-between items-start md:items-center py-[20px] border-b border-border last:border-b-0 transition-all duration-700 ${awardsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
                                     style={{
                                         opacity,
                                         gap: '40px',
@@ -118,7 +136,7 @@ export default function AwardsList() {
                                     onMouseMove={handleMouseMove}
                                 >
                                     <p className="mb-2 md:mb-0 md:order-2 text-right text-gray-400">{award.year}</p>
-                                    <p className="md:order-1 text-left">{award.title} - {award.event}</p>
+                                    <p className="md:order-1 text-left text-[22px]">{award.title}{award.event ? ` - ${award.event}` : ''}</p>
                                     {award.image_url && (
                                         <div
                                             className="pointer-events-none absolute z-10 top-0 left-0 w-[100px] h-[100px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 md:group-hover:block hidden"
@@ -129,6 +147,7 @@ export default function AwardsList() {
                                                 alt={`Proof for ${award.title}`}
                                                 width={100}
                                                 height={100}
+                                                loading="lazy"
                                                 className="object-cover rounded shadow-lg"
                                             />
                                         </div>
@@ -137,6 +156,7 @@ export default function AwardsList() {
                             );
                         })}
                     </ul>
+                    </div>
                 </div>
             )}
 
@@ -144,22 +164,23 @@ export default function AwardsList() {
             {exhibitions.length > 0 && (
                 <div ref={exhibitionsRef}>
                     <div className="mb-2">
-                        <span className="block text-lg font-semibold text-black text-center tracking-wide">Exhibitions</span>
+                        <span className="block text-lg font-semibold text-black text-center tracking-wide">{dictionary.recognition.exhibitions}</span>
                     </div>
                     <h2
                         className={`text-2xl font-headline mb-8 text-center transition-all duration-700 text-black ${exhibitionsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
                         key={exhibitionsAnimKey}
                     >
-                        Recent Shows & Venues
+                        {dictionary.recognition.shows}
                     </h2>
-                    <ul>
+                    <div className="h-[336px] overflow-hidden">
+                    <ul className="transition-transform duration-1000 ease-in-out" style={{ transform: `translateY(-${exhibitionOffset * 112}px)` }}>
                         {exhibitions.map((exhibition, idx) => {
                             const yearDiff = currentYear - exhibition.year;
                             const opacity = yearDiff > 5 ? 0.5 : 1 - (yearDiff * 0.1);
                             return (
                                 <li
                                     key={exhibition.id}
-                                    className={`group relative flex flex-col md:flex-row justify-between items-start md:items-center py-[20px] border-b border-border last:border-b-0 transition-all duration-700 ${exhibitionsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+                                    className={`group relative flex min-h-[112px] flex-col md:flex-row justify-between items-start md:items-center py-[20px] border-b border-border last:border-b-0 transition-all duration-700 ${exhibitionsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
                                     style={{
                                         opacity,
                                         gap: '40px',
@@ -171,7 +192,7 @@ export default function AwardsList() {
                                         {monthNames[(exhibition.month ? parseInt(exhibition.month, 10) : 1) - 1]} {exhibition.year}
                                     </p>
                                     <div className="md:order-1 text-left">
-                                        <p className="font-medium">{exhibition.title}</p>
+                                        <p className="text-[22px]">{exhibition.title}</p>
                                         <p className="text-sm text-gray-600">{exhibition.venue}, {exhibition.location}</p>
                                         {exhibition.description && (
                                             <p className="text-xs text-gray-500 mt-1">{exhibition.description}</p>
@@ -187,6 +208,7 @@ export default function AwardsList() {
                                                 alt={`Image from ${exhibition.title}`}
                                                 width={100}
                                                 height={100}
+                                                loading="lazy"
                                                 className="object-cover rounded shadow-lg"
                                             />
                                         </div>
@@ -195,13 +217,14 @@ export default function AwardsList() {
                             );
                         })}
                     </ul>
+                    </div>
                 </div>
             )}
 
             {/* Empty State */}
             {awards.length === 0 && exhibitions.length === 0 && (
                 <div className="text-center py-16">
-                    <p className="text-gray-500">No awards or exhibitions to display yet.</p>
+                    <p className="text-gray-500">{dictionary.recognition.empty}</p>
                 </div>
             )}
         </div>
