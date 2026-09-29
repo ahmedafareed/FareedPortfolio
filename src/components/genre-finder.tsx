@@ -18,6 +18,7 @@ export default function GenreFinder({ imageUrl, imageAlt = '', genres, onSelect 
   const pathname = usePathname();
   const { locale, dictionary } = useLocale();
   const routeWithoutLocale = /^\/(es|ca)(\/|$)/.test(pathname) ? pathname.replace(/^\/(es|ca)/, '') || '/' : pathname;
+  const introParts = dictionary.genre.intro.split(/(<strong>.*?<\/strong>)/g).filter(Boolean);
 
   return (
     <section className="relative min-h-screen overflow-hidden bg-ink text-ink" aria-labelledby="genre-finder-title">
@@ -34,7 +35,9 @@ export default function GenreFinder({ imageUrl, imageAlt = '', genres, onSelect 
           </div>
         </div>
         <fieldset className="max-w-3xl border-0 p-0 font-body">
-          <p className="max-w-3xl text-xl leading-[1.8] md:text-3xl md:leading-[1.65]">{dictionary.genre.intro}</p>
+          <p className="max-w-3xl text-xl leading-[1.8] md:text-3xl md:leading-[1.65]">
+            {introParts.map((part, index) => part.startsWith('<strong>') ? <strong key={index}>{part.slice(8, -9)}</strong> : part)}
+          </p>
           <legend id="genre-finder-title" className="sr-only">{dictionary.genre.looking}</legend>
           <div className="mt-10 flex flex-wrap items-center gap-3 text-base md:text-xl">
             <span aria-hidden="true" className="text-sm uppercase tracking-[0.18em]">{dictionary.genre.looking}</span>

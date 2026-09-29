@@ -39,13 +39,17 @@ export function middleware(req: NextRequest) {
     // (Temporarily) disable apex redirect to avoid loops in dev / multi-host environments
     // If needed in production, reintroduce with an env flag check.
 
+    const requestHeaders = new Headers(req.headers);
+    requestHeaders.set('x-site-key', siteKey);
+    requestHeaders.set('x-locale', locale);
+
     let response: NextResponse;
     if (locale === 'en') {
-        response = NextResponse.next();
+        response = NextResponse.next({ request: { headers: requestHeaders } });
     } else {
         const rewriteUrl = req.nextUrl.clone();
         rewriteUrl.pathname = routedPathname;
-        response = NextResponse.rewrite(rewriteUrl);
+        response = NextResponse.rewrite(rewriteUrl, { request: { headers: requestHeaders } });
     }
     response.headers.set('x-site-key', siteKey);
     response.headers.set('x-locale', locale);
