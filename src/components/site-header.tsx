@@ -14,7 +14,8 @@ export default function SiteHeader() {
   const localePrefix = locale === 'en' ? '' : `/${locale}`;
   const routeWithoutLocale = /^\/(es|ca)(\/|$)/.test(pathname) ? pathname.replace(/^\/(es|ca)/, '') || '/' : pathname;
   const isLanding = pathname === '/' || pathname.endsWith('/travel') || pathname.endsWith('/commercial');
-  const [visible, setVisible] = useState(!(pathname === '/commercial'));
+  const isCommercialLanding = routeWithoutLocale === '/commercial';
+  const [visible, setVisible] = useState(!isCommercialLanding);
   const links = [
     { href: `${localePrefix}${sitePrefix}/portfolio`, label: dictionary.nav.portfolio },
     { href: `${localePrefix}${sitePrefix}/about`, label: dictionary.nav.about },
@@ -24,7 +25,7 @@ export default function SiteHeader() {
 
   useEffect(() => {
     const isSubdomain = window.location.hostname.startsWith('commercial.');
-    if (pathname !== '/commercial' && !(pathname === '/' && isSubdomain)) {
+    if (!isCommercialLanding && !(pathname === '/' && isSubdomain)) {
       setVisible(true);
       return;
     }

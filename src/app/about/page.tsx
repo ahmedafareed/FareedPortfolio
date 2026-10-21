@@ -38,8 +38,8 @@ export default async function AboutPage() {
   }
 
   return (
-    <div className="grid md:grid-cols-2 min-h-screen">
-      <div className="relative h-screen hidden md:block">
+    <div className="grid min-h-screen md:grid-cols-2">
+      <div className="relative hidden h-[calc(100vh-6rem)] md:mt-24 md:block">
     {headshot && (
             <Image
         src={headshot.image_url}
@@ -51,7 +51,7 @@ export default async function AboutPage() {
             />
         )}
       </div>
-      <div className="flex flex-col justify-center items-start p-8 md:p-16 lg:p-24">
+      <div className="flex flex-col items-start justify-center p-8 pt-24 md:p-16 lg:p-24">
          <div className="w-full max-w-md mx-auto">
             <div className="md:hidden mb-8">
         {headshot && (
