@@ -5,13 +5,13 @@ function table(site: string | undefined, base: string) {
   return site === 'commercial' ? `commercial_${base}` : base;
 }
 
-// This API expects multipart/form-data with files[] and fields: title, aspect_ratio, category_id (optional)
+// This API expects multipart/form-data with files[] and fields: title (optional prefix), aspect_ratio, category_id (optional), site (optional)
 export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
-  const files = formData.getAll('files') as File[];
+    const files = formData.getAll('files').filter((value): value is File => value instanceof File);
     const title = (formData.get('title') as string) || '';
     const aspect = (formData.get('aspect_ratio') as string) as 'portrait' | 'landscape' | 'square';
     const categoryId = (formData.get('category_id') as string) || null;
@@ -59,10 +59,13 @@ export async function POST(req: NextRequest) {
       const { data: pub } = admin.storage.from(bucket).getPublicUrl(path);
       const imageUrl = pub.publicUrl;
 
+      const fileTitle = file.name.replace(/\.[^.]+$/, '') || 'Untitled image';
+      const imageTitle = title.trim() ? `${title.trim()} - ${fileTitle}` : fileTitle;
+
       const { data: inserted, error: insertErr } = await admin
         .from(table(site, 'portfolio_images'))
         .insert({
-          title: title || file.name,
+          title: imageTitle,
           description: null,
           category_id: categoryId,
           aspect_ratio: aspect,

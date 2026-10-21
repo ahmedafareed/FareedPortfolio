@@ -140,6 +140,7 @@ export default function AdminPortfolioPage() {
     form.append('title', title);
     form.append('aspect_ratio', aspect);
     if (categoryId) form.append('category_id', categoryId);
+    form.append('site', 'travel');
 
     const res = await fetch('/api/admin-upload', { method: 'POST', body: form });
     if (res.ok) {
@@ -223,6 +224,10 @@ export default function AdminPortfolioPage() {
               {uploading ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin"/> Uploading...</>) : (<><Plus className="mr-2 h-4 w-4"/> Upload</>)}
             </Button>
           </form>
+          <p className="mt-3 text-sm text-muted-foreground">
+            Select multiple images at once. Each image uses its filename as the title{title.trim() ? ` with "${title.trim()}" as a prefix` : ''}.
+            {files?.length ? ` ${files.length} image${files.length === 1 ? '' : 's'} selected.` : ''}
+          </p>
         </CardContent>
       </Card>
 

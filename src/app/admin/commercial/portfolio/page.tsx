@@ -203,6 +203,10 @@ export default function CommercialPortfolioPage() {
             <Input type="file" multiple accept="image/*" onChange={(e) => setFiles(e.target.files)} />
             <Button type="submit" disabled={uploading || !files || files.length === 0}>{uploading ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin"/> Uploading...</>) : (<><Plus className="mr-2 h-4 w-4"/> Upload</>)}</Button>
           </form>
+          <p className="mt-3 text-sm text-muted-foreground">
+            Select multiple images at once. Each image uses its filename as the title{title.trim() ? ` with "${title.trim()}" as a prefix` : ''}.
+            {files?.length ? ` ${files.length} image${files.length === 1 ? '' : 's'} selected.` : ''}
+          </p>
         </CardContent>
       </Card>
 
