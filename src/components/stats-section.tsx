@@ -71,13 +71,13 @@ export default function StatsSection() {
 
     return (
         <section ref={sectionRef} className="min-h-[50vh] w-full flex items-center justify-center text-center py-10 md:py-14 transition-opacity duration-1000" style={{ opacity: isVisible ? 1 : 0.1 }}>
-            <div className={`grid grid-cols-1 md:grid-cols-${stats.length} gap-10 md:gap-20`}>
+            <div className={`grid w-full grid-cols-2 gap-8 px-5 sm:gap-10 md:grid-cols-${stats.length} md:gap-20 md:px-0`}>
                 {stats.map((stat, idx) => (
                     <div key={stat.id} className="flex flex-col">
-                        <p className="text-7xl font-thin">
+                        <p className="text-5xl font-thin sm:text-6xl md:text-7xl">
                             {isVisible && <AnimatedNumber target={stat.value} />}
                         </p>
-                        <p className="text-sm tracking-widest text-muted-foreground">{stat.label}</p>
+                        <p className="text-xs tracking-[0.12em] text-muted-foreground sm:text-sm sm:tracking-widest">{stat.label}</p>
                     </div>
                 ))}
             </div>

@@ -205,7 +205,7 @@ export default function Home() {
     return (
         <div className="bg-background text-foreground selection:bg-accent selection:text-accent-foreground">
             {/* PROGRESS THREAD */}
-            <div className="fixed right-5 top-0 h-full w-px bg-border/50 z-50">
+            <div className="fixed right-2 top-0 z-50 hidden h-full w-px bg-border/50 sm:right-5 sm:block">
                 <div className="absolute top-0 left-0 h-full w-full bg-primary transition-transform duration-150 ease-linear" style={{ transform: `scaleY(${scrollPercentage / 100})`, transformOrigin: 'top' }} />
             </div>
             
@@ -213,7 +213,7 @@ export default function Home() {
             {heroImages.length > 0 && <ParallaxHero images={heroImages} tagline={displayTagline} featuredTitle={featuredStory} />}
 
             {/* SECTION 2: THE WORK - 2x3 rotating grid */}
-            <section id="work" className="w-full py-6 md:py-10 px-0 md:px-0">
+            <section id="work" className="w-full overflow-hidden py-5 md:py-10">
                 {displayedGridImages.length > 0 && (
                     <>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-[2px] sm:gap-1 md:gap-2 lg:gap-3 w-full" style={{ gridAutoRows: 'minmax(100px, 1fr)' }}>
@@ -238,7 +238,7 @@ export default function Home() {
                             })}
                         </div>
                         {/* Explore More Button */}
-                        <div className="w-full flex justify-center mt-8">
+                        <div className="flex w-full justify-center px-5 mt-7 sm:mt-8">
                             <ExploreMoreButton />
                         </div>
                     </>
@@ -268,7 +268,7 @@ export default function Home() {
                 {/* Removed personality section to keep homepage focused and clean */}
 
             {/* SECTION 4: THE INVITATION + social links */}
-            <section className="w-full relative flex flex-col items-center justify-center text-center p-8 md:p-12">
+            <section className="relative flex w-full flex-col items-center justify-center px-5 py-16 text-center sm:p-8 md:p-12">
                 {contactImage && (
                     <div className="absolute inset-0 -z-10">
                         <Image
@@ -284,7 +284,7 @@ export default function Home() {
                 )}
                 <div className="relative z-10 text-foreground">
                     <h2 className="font-headline text-3xl md:text-5xl mb-6">{dictionary.home.together}</h2>
-                    <a href={`mailto:${contactEmail}`} className="text-lg md:text-2xl font-body block mb-1 hover:underline">
+                    <a href={`mailto:${contactEmail}`} className="block max-w-full break-all text-base font-body hover:underline sm:text-lg md:text-2xl">
                         {contactEmail}
                     </a>
                     <p className="text-sm text-muted-foreground mb-6">{dictionary.home.response}</p>

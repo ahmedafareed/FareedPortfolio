@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
@@ -7,6 +7,12 @@ import LocaleProvider from '@/components/locale-provider';
 import { headers } from 'next/headers';
 import { isLocale, type Locale } from '@/lib/i18n';
 import { getDictionary } from '@/lib/i18n';
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+};
 
 export async function generateMetadata(): Promise<Metadata> {
   const localeHeader = (await headers()).get('x-locale');

@@ -37,7 +37,7 @@ export default function ParallaxHero({ images, tagline = 'AVAILABLE FOR COMMISSI
     const parallaxY = mousePosition.y * -10;
 
     return (
-        <section className="h-screen w-full relative flex items-center justify-center overflow-hidden">
+        <section className="relative flex min-h-[100svh] w-full items-center justify-center overflow-hidden md:h-screen">
             {/* Background Images */}
             {images.map((image, index) => (
                 <div
@@ -61,12 +61,12 @@ export default function ParallaxHero({ images, tagline = 'AVAILABLE FOR COMMISSI
             ))}
             <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent" aria-hidden="true"></div>
 
-            <div className="absolute inset-x-0 bottom-0 z-10 px-5 pb-12 text-white md:px-16 md:pb-20">
-                <p className="mb-5 text-xs uppercase tracking-[0.22em] text-white/75">{dictionary.hero.available}</p>
-                <h1 className="max-w-4xl font-headline text-[clamp(3.5rem,8vw,5.75rem)] font-medium leading-[0.92]">{dictionary.hero.story}</h1>
-                <div className="mt-8 flex flex-wrap items-end justify-between gap-6">
-                    <p className="text-sm uppercase tracking-[0.18em] text-white/75">AHMED FAREED - {tagline || 'TRAVEL PHOTOGRAPHER'}</p>
-                    {featuredTitle && <p className="max-w-xs border-l border-white/50 pl-4 text-sm text-white/80"><span className="mb-1 block text-[10px] uppercase tracking-[0.2em] text-white/55">{dictionary.hero.featured}</span>{featuredTitle}</p>}
+            <div className="absolute inset-x-0 bottom-0 z-10 px-5 pb-10 text-white sm:pb-12 md:px-16 md:pb-20">
+                <p className="mb-4 text-[10px] uppercase tracking-[0.18em] text-white/75 sm:text-xs sm:tracking-[0.22em]">{dictionary.hero.available}</p>
+                <h1 className="max-w-4xl font-headline text-[clamp(2.75rem,12vw,5.75rem)] font-medium leading-[0.94]">{dictionary.hero.story}</h1>
+                <div className="mt-6 flex flex-col items-start gap-5 sm:mt-8 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between sm:gap-6">
+                    <p className="text-[11px] uppercase tracking-[0.14em] text-white/75 sm:text-sm sm:tracking-[0.18em]">AHMED FAREED - {tagline || 'TRAVEL PHOTOGRAPHER'}</p>
+                    {featuredTitle && <p className="max-w-xs border-l border-white/50 pl-3 text-xs text-white/80 sm:pl-4 sm:text-sm"><span className="mb-1 block text-[9px] uppercase tracking-[0.16em] text-white/55 sm:text-[10px] sm:tracking-[0.2em]">{dictionary.hero.featured}</span>{featuredTitle}</p>}
                 </div>
             </div>
         </section>
