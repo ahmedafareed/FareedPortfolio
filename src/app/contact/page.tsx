@@ -109,16 +109,18 @@ export default async function ContactPage() {
         </div>
       </div>
       
-      <div className="relative hidden lg:block">
+      <div className="relative hidden min-h-screen lg:block">
         {contactImage && (
-            <Image
-                src={contactImage.image_url}
-                alt={contactImage.description || ''}
-                fill
-                className="object-cover"
-                data-ai-hint={contactImage.alt_text || ''}
-                priority
-            />
+            <div className="absolute inset-x-0 bottom-0 top-24">
+                <Image
+                    src={contactImage.image_url}
+                    alt={contactImage.description || ''}
+                    fill
+                    className="object-cover object-top"
+                    data-ai-hint={contactImage.alt_text || ''}
+                    priority
+                />
+            </div>
         )}
       </div>
     </div>

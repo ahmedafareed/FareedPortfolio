@@ -46,9 +46,13 @@ export default function PortfolioGallery() {
 
   useEffect(() => { load(); }, [locale]);
 
-  const filtered = activeCategory === 'All' 
-    ? images.sort((a, b) => a.sort_order - b.sort_order) // Ensure row-wise order
-    : images.filter(i => i.category_id === activeCategory).sort((a, b) => a.sort_order - b.sort_order);
+  const sortByUploadDate = (a: FullImage, b: FullImage) => {
+    const dateDifference = new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    return dateDifference || b.sort_order - a.sort_order;
+  };
+  const filtered = (activeCategory === 'All' ? images : images.filter(i => i.category_id === activeCategory))
+    .slice()
+    .sort(sortByUploadDate);
 
   const openLightbox = (image: FullImage) => {
     setSelectedImage(image);
@@ -57,7 +61,7 @@ export default function PortfolioGallery() {
 
   return (
     <div className="container mx-auto px-2 sm:px-4 py-8 sm:py-16 lg:py-24 min-h-screen">
-      <div className="sticky top-0 bg-background/95 backdrop-blur-sm z-10 py-3 sm:py-4 mb-4 sm:mb-8">
+      <div className="sticky top-16 md:top-0 bg-background/95 backdrop-blur-sm z-10 py-3 sm:py-4 mb-4 sm:mb-8">
         <div className="flex justify-center items-center flex-wrap gap-2 sm:gap-4">
             <button
               onClick={() => setActiveCategory('All')}

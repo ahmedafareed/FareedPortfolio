@@ -281,7 +281,7 @@ export class PortfolioService {
           *,
           category:${catTable}(*)
         `)
-        .order('title', { ascending: false }); // Sort by last modified in descending order
+        .order('created_at', { ascending: false });
 
       if (categoryId) {
         query = query.eq('category_id', categoryId);
