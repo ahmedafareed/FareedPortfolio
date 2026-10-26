@@ -27,14 +27,14 @@ export default function DataSeeder() {
 
       // Travel exhibitions
       const travelExhibitions = [
-        { title: 'Wanderlust: A Journey Through Landscapes', venue: 'Gallery One', location: 'New York', year: 2024, month: '6' },
-        { title: 'Cultural Connections', venue: 'International Photo Center', location: 'Paris', year: 2023, month: '9' },
+        { title: 'Wanderlust: A Journey Through Landscapes', venue: 'Gallery One', location: 'New York', year: 2024, month: '6', description: null, image_url: null, storage_path: null, sort_order: 1 },
+        { title: 'Cultural Connections', venue: 'International Photo Center', location: 'Paris', year: 2023, month: '9', description: null, image_url: null, storage_path: null, sort_order: 2 },
       ];
 
       // Commercial exhibitions
       const commercialExhibitions = [
-        { title: 'Brand Stories: Commercial Photography', venue: 'Modern Art Museum', location: 'London', year: 2024, month: '3' },
-        { title: 'Visual Impact: Advertising Arts', venue: 'Creative Space Gallery', location: 'Tokyo', year: 2023, month: '11' },
+        { title: 'Brand Stories: Commercial Photography', venue: 'Modern Art Museum', location: 'London', year: 2024, month: '3', description: null, image_url: null, storage_path: null, sort_order: 1 },
+        { title: 'Visual Impact: Advertising Arts', venue: 'Creative Space Gallery', location: 'Tokyo', year: 2023, month: '11', description: null, image_url: null, storage_path: null, sort_order: 2 },
       ];
 
       // Seed travel data

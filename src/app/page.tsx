@@ -16,6 +16,15 @@ import { useLocale } from '@/components/locale-provider';
 
 
 const personalityWords = ['OBSERVER', 'STORYTELLER'];
+const EXCLUDED_COMMERCIAL_WELCOME_CATEGORY_KEYWORDS = ['festival', 'celebration'];
+
+function shouldShowCommercialCategoryInWelcome(category: PortfolioCategory) {
+    const normalizedName = category.name.toLowerCase();
+    const normalizedDisplayName = category.display_name.toLowerCase();
+    return !EXCLUDED_COMMERCIAL_WELCOME_CATEGORY_KEYWORDS.some(keyword =>
+        normalizedName.includes(keyword) || normalizedDisplayName.includes(keyword),
+    );
+}
 
 export default function Home() {
     const { locale, dictionary } = useLocale();
@@ -94,6 +103,16 @@ export default function Home() {
                 PortfolioService.localizeRecords(categoryDataRaw, detectedSite, locale, 'category', ['name', 'display_name', 'description']),
             ]);
             setCategories(categoryData);
+            if (detectedSite === 'commercial' && storedCategory) {
+                const isStoredCategoryVisibleInWelcome = categoryData
+                    .filter(shouldShowCommercialCategoryInWelcome)
+                    .some(category => category.id === storedCategory);
+                if (!isStoredCategoryVisibleInWelcome) {
+                    window.sessionStorage.removeItem('commercial-genre');
+                    setSelectedCategoryId('');
+                    setCommercialIntroComplete(false);
+                }
+            }
 
             // Set contact email and tagline if available
             if (emailSetting?.value) {
@@ -195,9 +214,12 @@ export default function Home() {
         window.sessionStorage.setItem('commercial-genre', categoryId);
         window.dispatchEvent(new Event('commercial-genre-selected'));
     };
+    const welcomeCategories = site === 'commercial'
+        ? categories.filter(shouldShowCommercialCategoryInWelcome)
+        : categories;
 
     if (site === 'commercial' && !commercialIntroComplete) {
-        return <GenreFinder imageUrl={heroImages[0]?.imageUrl} imageAlt={heroImages[0]?.imageHint} genres={categories.map(category => ({ id: category.id, label: category.display_name }))} onSelect={chooseGenre} />;
+        return <GenreFinder imageUrl={heroImages[0]?.imageUrl} imageAlt={heroImages[0]?.imageHint} genres={welcomeCategories.map(category => ({ id: category.id, label: category.display_name }))} onSelect={chooseGenre} />;
     }
 
 

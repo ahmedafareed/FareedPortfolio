@@ -8,6 +8,7 @@ import { PortfolioService, type PortfolioImageWithCategory, type PortfolioCatego
 import { Plus, Loader2, Trash2, Star, StarOff, Crown } from 'lucide-react';
 
 const SITE = 'commercial';
+const EDITORIAL_CATEGORY_KEYWORD = 'editorial';
 
 export default function CommercialPortfolioPage() {
   const [images, setImages] = useState<PortfolioImageWithCategory[]>([]);
@@ -21,6 +22,11 @@ export default function CommercialPortfolioPage() {
   const [uploading, setUploading] = useState(false);
   const [files, setFiles] = useState<FileList | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const isEditorialCategory = (category: PortfolioImageWithCategory['category']) => {
+    if (!category) return false;
+    return category.name.toLowerCase().includes(EDITORIAL_CATEGORY_KEYWORD) || category.display_name.toLowerCase().includes(EDITORIAL_CATEGORY_KEYWORD);
+  };
 
   const load = async () => {
     setLoading(true);
@@ -207,6 +213,9 @@ export default function CommercialPortfolioPage() {
             Select multiple images at once. Each image uses its filename as the title{title.trim() ? ` with "${title.trim()}" as a prefix` : ''}.
             {files?.length ? ` ${files.length} image${files.length === 1 ? '' : 's'} selected.` : ''}
           </p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            For Editorial stories, set the title prefix to the story name before uploading. The portfolio will group editorial images by that story label.
+          </p>
         </CardContent>
       </Card>
 
@@ -264,6 +273,9 @@ export default function CommercialPortfolioPage() {
                   <div>
                     <div className="text-sm text-muted-foreground mb-1">{img.category?.display_name || 'Uncategorized'} · {img.aspect_ratio}</div>
                     <div className="font-medium text-sm">{img.title}</div>
+                    {isEditorialCategory(img.category) && (
+                      <div className="text-xs text-muted-foreground mt-1">Story label: {getEditorialStoryLabel(img.title)}</div>
+                    )}
                     <div className="text-xs text-muted-foreground mt-1 truncate">{img.image_url}</div>
                   </div>
                   
@@ -300,4 +312,11 @@ export default function CommercialPortfolioPage() {
       </Card>
     </div>
   );
+}
+
+function getEditorialStoryLabel(title: string | null): string {
+  const normalizedTitle = (title || '').trim();
+  if (!normalizedTitle) return 'Untitled Story';
+  const [storyLabel] = normalizedTitle.split(' - ');
+  return (storyLabel || normalizedTitle).trim();
 }

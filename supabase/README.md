@@ -42,6 +42,11 @@ The public locale routes are `/es/travel`, `/es/commercial`, `/ca/travel`, and `
 1. Copy and paste the contents of `seed.sql` in the SQL Editor
 2. Run the SQL to populate initial categories and settings
 
+### 4.1 Commercial Portfolio Categories Update (Portrait + Editorial)
+1. Run `commercial_schema.sql` if commercial tables are not created yet.
+2. Run `commercial_editorial.sql` to add/update the `Portrait` and `Editorial` commercial categories.
+3. The script also adds/updates Spanish and Catalan category translations in `content_translations`.
+
 ### 5. Set Up Storage (Optional)
 If you want to use Supabase Storage for image uploads:
 1. Go to Storage in your Supabase dashboard
