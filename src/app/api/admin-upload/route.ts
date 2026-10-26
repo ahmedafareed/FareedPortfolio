@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import sharp from 'sharp';
 
 function table(site: string | undefined, base: string) {
   return site === 'commercial' ? `commercial_${base}` : base;
@@ -44,6 +45,7 @@ export async function POST(req: NextRequest) {
     for (const file of files) {
       const arrayBuffer = await file.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
+      const metadata = await sharp(buffer).metadata();
       const ext = file.name.split('.').pop() || 'jpg';
       const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
       const path = `${filename}`;
@@ -71,8 +73,8 @@ export async function POST(req: NextRequest) {
           aspect_ratio: aspect,
           image_url: imageUrl,
           storage_path: path,
-          width: null,
-          height: null,
+          width: metadata.width || null,
+          height: metadata.height || null,
           alt_text: null,
           is_featured: false,
           is_hero: false,

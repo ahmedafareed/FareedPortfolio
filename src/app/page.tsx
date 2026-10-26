@@ -45,7 +45,7 @@ export default function Home() {
     const [selectedCategoryId, setSelectedCategoryId] = useState('');
     const [categories, setCategories] = useState<PortfolioCategory[]>([]);
     const [heroImages, setHeroImages] = useState<{ id: string; imageUrl: string; description: string; imageHint?: string }[]>([]);
-    const [gridImages, setGridImages] = useState<{ imageUrl: string; description: string; imageHint?: string; categoryId?: string | null }[]>([]);
+    const [gridImages, setGridImages] = useState<{ imageUrl: string; description: string; imageHint?: string; categoryId?: string | null; aspectRatio?: string }[]>([]);
     const [contactImage, setContactImage] = useState<{ imageUrl: string; description: string; imageHint?: string } | null>(null);
     const [featuredStory, setFeaturedStory] = useState('');
     const [currentGridImageIndices, setCurrentGridImageIndices] = useState<number[]>([0, 1, 2, 3, 4, 5]);
@@ -158,7 +158,15 @@ export default function Home() {
                 ]);
 
                 // Use all images for grid rotation
-                const grid = images.map(i => ({ imageUrl: i.image_url, description: i.description || '', imageHint: i.alt_text || '', categoryId: i.category_id }));
+                const grid = images
+                    .filter(i => i.aspect_ratio !== 'portrait')
+                    .map(i => ({
+                        imageUrl: i.image_url,
+                        description: i.description || '',
+                        imageHint: i.alt_text || '',
+                        categoryId: i.category_id,
+                        aspectRatio: i.aspect_ratio,
+                    }));
                 setGridImages(grid);
 
                 // Use last featured as contact backdrop

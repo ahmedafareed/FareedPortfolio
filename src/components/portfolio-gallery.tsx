@@ -41,16 +41,18 @@ export default function PortfolioGallery() {
     setCategories(cats.map(c => ({ id: c.id, name: c.name, display_name: c.display_name })));
     setImages((imgs || []).map(i => ({
       ...i,
-      width: i.width || 1200,
-      height: i.height || 800,
+      width: i.width || getFallbackDimensions(i.aspect_ratio).width,
+      height: i.height || getFallbackDimensions(i.aspect_ratio).height,
     })) as FullImage[]);
   };
 
   useEffect(() => { load(); }, [locale]);
 
   const sortByUploadDate = (a: FullImage, b: FullImage) => {
+    const portraitDifference = Number(a.aspect_ratio === 'portrait') - Number(b.aspect_ratio === 'portrait');
+    if (portraitDifference) return portraitDifference;
     const dateDifference = new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-    return dateDifference || b.sort_order - a.sort_order;
+    return dateDifference || b.sort_order - a.sort_order || b.id.localeCompare(a.id);
   };
   const filtered = (activeCategory === 'All' ? images : images.filter(i => i.category_id === activeCategory))
     .slice()
@@ -72,6 +74,30 @@ export default function PortfolioGallery() {
         }, new Map<string, FullImage[]>()),
       )
     : [];
+  const renderImageGroups = (groupImages: FullImage[], gapClass: string) => {
+    const landscapeImages = groupImages.filter(image => image.aspect_ratio !== 'portrait');
+    const portraitImages = groupImages.filter(image => image.aspect_ratio === 'portrait');
+    const gridClass = `grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 items-start ${gapClass}`;
+
+    return (
+      <>
+        {landscapeImages.length > 0 && (
+          <div className={gridClass}>
+            {landscapeImages.map(image => (
+              <PortfolioImageCard key={image.id} image={image} onClick={openLightbox} />
+            ))}
+          </div>
+        )}
+        {portraitImages.length > 0 && (
+          <div className={cn(gridClass, landscapeImages.length > 0 && 'mt-2 sm:mt-3 lg:mt-4')}>
+            {portraitImages.map(image => (
+              <PortfolioImageCard key={image.id} image={image} onClick={openLightbox} />
+            ))}
+          </div>
+        )}
+      </>
+    );
+  };
 
   const openLightbox = (image: FullImage) => {
     setSelectedImage(image);
@@ -115,45 +141,62 @@ export default function PortfolioGallery() {
           {editorialStories.map(([storyLabel, storyImages]) => (
             <section key={storyLabel} className="space-y-4 sm:space-y-5">
               <h2 className="text-sm sm:text-base font-semibold tracking-[0.2em] uppercase">{storyLabel}</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
-                {storyImages.map((image) => (
-                  <div key={image.id} className="break-inside-avoid mb-1 sm:mb-1.5 lg:mb-2" style={{ aspectRatio: `${image.width} / ${image.height}` }} onClick={() => openLightbox(image)}>
-                    <div className="relative overflow-hidden cursor-pointer group shadow-md">
+              <div className="space-y-3 sm:space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 items-start gap-2 sm:gap-3 lg:gap-4">
+                {storyImages.filter(image => image.aspect_ratio !== 'portrait').map((image) => (
+                  <div
+                    key={image.id}
+                    className={cn(
+                      'w-full overflow-hidden',
+                      image.aspect_ratio === 'portrait' ? 'aspect-[4/5]' : 'aspect-[3/2]',
+                    )}
+                    onClick={() => openLightbox(image)}
+                  >
+                    <div className="relative h-full overflow-hidden cursor-pointer group shadow-md">
                       <Image
                         src={image.image_url}
                         alt={image.description || ''}
                         width={image.width}
                         height={image.height}
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
-                        className="w-full h-auto object-cover transition-all duration-400 saturate-[.9] group-hover:saturate-100"
+                        className="h-full w-full object-cover transition-all duration-400 saturate-[.9] group-hover:saturate-100"
                         data-ai-hint={image.alt_text || ''}
                         placeholder="blur"
                         blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
                       />
+                      </div>
                     </div>
-                  </div>
                 ))}
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 items-start gap-2 sm:gap-3 lg:gap-4">
+                {storyImages.filter(image => image.aspect_ratio === 'portrait').map((image) => (
+                  <PortfolioImageCard key={image.id} image={image} onClick={openLightbox} />
+                ))}
+              </div>
               </div>
             </section>
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-1 sm:gap-1.5 lg:gap-2">
-          {filtered.map((image) => (
+        <div className="space-y-2 sm:space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 items-start gap-1 sm:gap-1.5 lg:gap-2">
+          {filtered.filter(image => image.aspect_ratio !== 'portrait').map((image) => (
             <div
               key={image.id}
-              className="break-inside-avoid mb-1 sm:mb-1.5 lg:mb-2"
-              style={{ aspectRatio: `${image.width} / ${image.height}` }}
+              className={cn(
+                'w-full overflow-hidden',
+                image.aspect_ratio === 'portrait' ? 'aspect-[4/5]' : 'aspect-[3/2]',
+              )}
               onClick={() => openLightbox(image)}
             >
-              <div className="relative overflow-hidden cursor-pointer group shadow-md">
+              <div className="relative h-full overflow-hidden cursor-pointer group shadow-md">
                 <Image
                   src={image.image_url}
                   alt={image.description || ''}
                   width={image.width}
                   height={image.height}
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
-                  className="w-full h-auto object-cover transition-all duration-400 saturate-[.9] group-hover:saturate-100"
+                  className="h-full w-full object-cover transition-all duration-400 saturate-[.9] group-hover:saturate-100"
                   data-ai-hint={image.alt_text || ''}
                   placeholder="blur"
                   blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
@@ -161,6 +204,12 @@ export default function PortfolioGallery() {
               </div>
             </div>
           ))}
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 items-start gap-1 sm:gap-1.5 lg:gap-2">
+            {filtered.filter(image => image.aspect_ratio === 'portrait').map((image) => (
+              <PortfolioImageCard key={image.id} image={image} onClick={openLightbox} />
+            ))}
+          </div>
         </div>
       )}
 
@@ -187,4 +236,36 @@ function getEditorialStoryLabel(title: string | null): string {
   if (!normalizedTitle) return 'Untitled Story';
   const [storyLabel] = normalizedTitle.split(' - ');
   return (storyLabel || normalizedTitle).trim();
+}
+
+function PortfolioImageCard({ image, onClick }: { image: FullImage; onClick: (image: FullImage) => void }) {
+  return (
+    <div
+      className={cn(
+        'w-full overflow-hidden',
+        image.aspect_ratio === 'portrait' ? 'aspect-[4/5]' : 'aspect-[3/2]',
+      )}
+      onClick={() => onClick(image)}
+    >
+      <div className="relative h-full overflow-hidden cursor-pointer group shadow-md">
+        <Image
+          src={image.image_url}
+          alt={image.description || ''}
+          width={image.width}
+          height={image.height}
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+          className="h-full w-full object-cover transition-all duration-400 saturate-[.9] group-hover:saturate-100"
+          data-ai-hint={image.alt_text || ''}
+          placeholder="blur"
+          blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+        />
+      </div>
+    </div>
+  );
+}
+
+function getFallbackDimensions(aspectRatio: FullImage['aspect_ratio']): { width: number; height: number } {
+  if (aspectRatio === 'portrait') return { width: 800, height: 1200 };
+  if (aspectRatio === 'square') return { width: 1000, height: 1000 };
+  return { width: 1200, height: 800 };
 }
