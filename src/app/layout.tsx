@@ -50,7 +50,7 @@ export default async function RootLayout({
         <LocaleProvider locale={locale}>
           <div className="relative flex min-h-screen">
             <SiteHeader />
-            <main className="flex-1">{children}</main>
+            <main className="min-w-0 flex-1">{children}</main>
           </div>
         </LocaleProvider>
         <Toaster />

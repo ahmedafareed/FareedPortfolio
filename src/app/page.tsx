@@ -233,7 +233,7 @@ export default function Home() {
 
 
     return (
-        <div className="bg-background text-foreground selection:bg-accent selection:text-accent-foreground">
+        <div className="w-full min-w-0 max-w-full overflow-x-clip bg-background text-foreground selection:bg-accent selection:text-accent-foreground">
             {/* PROGRESS THREAD */}
             <div className="fixed right-2 top-0 z-50 hidden h-full w-px bg-border/50 sm:right-5 sm:block">
                 <div className="absolute top-0 left-0 h-full w-full bg-primary transition-transform duration-150 ease-linear" style={{ transform: `scaleY(${scrollPercentage / 100})`, transformOrigin: 'top' }} />
@@ -243,10 +243,10 @@ export default function Home() {
             {heroImages.length > 0 && <ParallaxHero images={heroImages} tagline={displayTagline} featuredTitle={featuredStory} />}
 
             {/* SECTION 2: THE WORK - 2x3 rotating grid */}
-            <section id="work" className="w-full overflow-hidden py-5 md:py-10">
+            <section id="work" className="w-full min-w-0 overflow-hidden py-5 md:py-10">
                 {displayedGridImages.length > 0 && (
                     <>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-[2px] sm:gap-1 md:gap-2 lg:gap-3 w-full" style={{ gridAutoRows: 'minmax(100px, 1fr)' }}>
+                        <div className="grid w-full min-w-0 grid-cols-2 gap-[2px] sm:gap-1 md:grid-cols-3 md:gap-2 lg:gap-3" style={{ gridAutoRows: 'minmax(100px, 1fr)' }}>
                             {Array.from({ length: 6 }, (_, index) => {
                                 const imageIndex = currentGridImageIndices[index] ?? index % displayedGridImages.length;
                                 const image = displayedGridImages.length > 0 ? displayedGridImages[imageIndex % displayedGridImages.length] : undefined;
